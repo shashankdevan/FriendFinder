@@ -3,10 +3,8 @@ package com.example.friendfinder;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class MyActivity extends Activity {
-    /**
-     * Called when the activity is first created.
-     */
+public class MapActivity extends Activity {
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
