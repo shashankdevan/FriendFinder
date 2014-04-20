@@ -9,8 +9,6 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,6 +37,8 @@ public class MapActivity extends Activity implements SendData {
     private Context context;
 
     private GoogleMap map;
+
+    private String username = "elixir";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,15 +99,25 @@ public class MapActivity extends Activity implements SendData {
             params[0] = timeStamp;
             params[1] = String.valueOf(location.getLatitude());
             params[2] = String.valueOf(location.getLongitude());
-            params[3] = "elixir";
+            params[3] = username;
             DownloadSession mySession = new DownloadSession();
             mySession.delegate = (SendData) context;
             mySession.execute(params);
         }
     }
 
-    public void getData(String responseString) {
-        Toast.makeText(this, responseString, Toast.LENGTH_LONG).show();
+    public void displayFriends(String responseString) {
+        String lines[] = responseString.split("\\r?\\n");
+
+        for (String line : lines) {
+            String params[] = line.split(" ");
+            if (params[0] != username) {
+                map.addMarker(new MarkerOptions()
+                        .position(new LatLng(Double.valueOf(params[1]), Double.valueOf(params[2])))
+                        .title(params[0])
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
+        }
     }
 
     private static class DownloadSession extends AsyncTask<String, Integer, String> {
@@ -151,7 +161,7 @@ public class MapActivity extends Activity implements SendData {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            delegate.getData(result);
+            delegate.displayFriends(result);
         }
 
         @Override

@@ -79,9 +79,9 @@ while($i < mysql_num_rows($list)) {
 }
 
 for ($i = 0; $i < $count; $i++) {
-    print "$idarray[$i] ";
-    print "$latarray[$i] ";
-    print "$longarray[$i] ";
+    print "$idarray[$i],";
+    print "$latarray[$i],";
+    print "$longarray[$i],";
     print "\n";
 }
 
