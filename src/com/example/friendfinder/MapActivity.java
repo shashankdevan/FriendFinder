@@ -110,7 +110,7 @@ public class MapActivity extends Activity implements SendData {
         String lines[] = responseString.split("\\r?\\n");
 
         for (String line : lines) {
-            String params[] = line.split(" ");
+            String params[] = line.split(",");
             if (params[0] != username) {
                 map.addMarker(new MarkerOptions()
                         .position(new LatLng(Double.valueOf(params[1]), Double.valueOf(params[2])))
