@@ -61,6 +61,7 @@ public class MapActivity extends Activity implements SendData {
             double longitude = location.getLongitude();
 
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 16));
+            map.clear();
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
