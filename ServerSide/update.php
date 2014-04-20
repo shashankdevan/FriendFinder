@@ -56,14 +56,14 @@ $longarray = array();
 $count = 0;
 
 while($i < mysql_num_rows($list)) {
-    $tb_names[$i] = mysql_tablename($list,$i);
+    $tb_names[$i] = mysql_tablename($list, $i);
     $sql = "SELECT * FROM $tb_names[$i] order by Date desc limit 1";
     $result = mysql_query($sql, $con);
     $num = mysql_numrows($result);
     $j = 0;
 
     while($j < $num) {
-        $fielddate=mysql_result($result,$j,"Date");
+        $fielddate = mysql_result($result, $j, "Date");
         $fieldlatitude = mysql_result($result, $j, "Latitude");
         $fieldlongitude = mysql_result($result, $j, "Longitude");
         $phpdate = strtotime($fielddate);
@@ -71,7 +71,7 @@ while($i < mysql_num_rows($list)) {
         $idarray[] = $tb_names[$i];
         $latarray[] = $fieldlatitude;
         $longarray[] = $fieldlongitude;
-        $count ++;
+        $count++;
         $j++;
     }
 
@@ -93,7 +93,7 @@ function distance($lat1, $long1, $lat2, $lon2) {
     $dist = acos($dist);
     $dist = rad2deg($dist);
     $miles = $dist * 60 * 1.1515;
-    return ($miles*1.609344);
+    return ($miles * 1.609344);
 }
 
 function table_exists($tablename, $database = false) {
