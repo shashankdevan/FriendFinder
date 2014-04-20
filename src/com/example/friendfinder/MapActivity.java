@@ -12,6 +12,12 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -32,11 +38,15 @@ public class MapActivity extends Activity implements SendData {
     private Handler myHandler = new Handler();
     private Context context;
 
+    private GoogleMap map;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         context = this;
+
+        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 
         GpsListener listener = new GpsListener();
         LocationManager locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
@@ -47,8 +57,15 @@ public class MapActivity extends Activity implements SendData {
 
         @Override
         public void onLocationChanged(Location location) {
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 16));
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(latitude, longitude))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
             LocationSender task = new LocationSender(location);
-            Log.d("-----------", "On Location changed");
             myHandler.post(task);
         }
 
@@ -82,7 +99,6 @@ public class MapActivity extends Activity implements SendData {
             params[1] = String.valueOf(location.getLatitude());
             params[2] = String.valueOf(location.getLongitude());
             params[3] = "elixir";
-            Log.d("-----------", "In thread!!");
             DownloadSession mySession = new DownloadSession();
             mySession.delegate = (SendData) context;
             mySession.execute(params);

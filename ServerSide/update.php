@@ -10,7 +10,7 @@ $id = $_REQUEST["id"];
 //$time = "2011-02-01 13:51:30";
 //$id = newexample;
 
-$con = mysql_connect("localhost","dummy","dummy");
+$con = mysql_connect("localhost", "dummy", "dummy");
 
 if(!$con) {
     die('Could not connect: ' . mysql_error());
