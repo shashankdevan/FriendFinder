@@ -5,7 +5,9 @@ $longitude = $_REQUEST["longitude"];
 $time= $_REQUEST["time"];
 $id = $_REQUEST["id"];
 
-$con = mysql_connect("localhost", "dummy", "dummy");
+$db_username = file_get_contents('./database_config.txt', NULL, NULL, 0, 11);
+$db_password = file_get_contents('./database_config.txt', NULL, NULL, 12, 15);
+$con = mysql_connect("localhost", $db_username, $db_password);
 
 if(!$con) {
     die('Could not connect: ' . mysql_error());
@@ -14,7 +16,7 @@ if(!$con) {
 $db_selected = mysql_select_db("mobile_artisans", $con);
 
 if(!$db_selected) {
-    die('Can\'t use demo: ' . mysql_error());
+    die('Can\'t use mobile_artisans: ' . mysql_error());
 }
 
 if(!table_exists("$id")) {
