@@ -5,11 +5,6 @@ $longitude = $_REQUEST["longitude"];
 $time= $_REQUEST["time"];
 $id = $_REQUEST["id"];
 
-//$longitude = 43.26;
-//$latitude = -94.23;
-//$time = "2011-02-01 13:51:30";
-//$id = newexample;
-
 $con = mysql_connect("localhost", "dummy", "dummy");
 
 if(!$con) {
@@ -53,6 +48,7 @@ $i = 0;
 $idarray = array();
 $latarray = array();
 $longarray = array();
+$distarray = array();
 $count = 0;
 
 while($i < mysql_num_rows($list)) {
@@ -68,10 +64,13 @@ while($i < mysql_num_rows($list)) {
         $fieldlongitude = mysql_result($result, $j, "Longitude");
         $phpdate = strtotime($fielddate);
         $dist = distance($fieldlatitude, $fieldlongitude, $latitude, $longitude);
-        $idarray[] = $tb_names[$i];
-        $latarray[] = $fieldlatitude;
-        $longarray[] = $fieldlongitude;
-        $count++;
+       if($dist < 0.2) {
+            $idarray[] = $tb_names[$i];
+            $latarray[] = $fieldlatitude;
+            $longarray[] = $fieldlongitude;
+            $distarray[] = $dist;
+            $count++;
+       }
         $j++;
     }
 
@@ -82,18 +81,17 @@ for ($i = 0; $i < $count; $i++) {
     print "$idarray[$i],";
     print "$latarray[$i],";
     print "$longarray[$i],";
+    print "$distarray[$i]";
     print "\n";
 }
 
 mysql_close($con);
 
-function distance($lat1, $long1, $lat2, $lon2) {
+function distance($lat1, $long1, $lat2, $long2) {
     $theta = $lon1 - $lon2;
     $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
     $dist = acos($dist);
-    $dist = rad2deg($dist);
-    $miles = $dist * 60 * 1.1515;
-    return ($miles * 1.609344);
+    return ($dist * 6371);
 }
 
 function table_exists($tablename, $database = false) {
