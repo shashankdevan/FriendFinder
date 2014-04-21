@@ -3,6 +3,11 @@
 $username = $_REQUEST["username"];
 $password = $_REQUEST["password"];
 
+if(empty($username) or empty($password)) {
+    header("HTTP/1.0 400 Bad Request");
+    die("Username or Password cannot be blank.");
+}
+
 $db_username = file_get_contents('./database_config.txt', NULL, NULL, 0, 11);
 $db_password = file_get_contents('./database_config.txt', NULL, NULL, 0, 15);
 $con = mysql_connect("localhost", $db_username, $db_password);
@@ -30,14 +35,14 @@ $result = mysql_query($sql, $con);
 
 if(!$result) {
     header("HTTP/1.0 401 Unauthorized");
-    die("The username or password you entered is incorrect.\n");
+    die("The username or password you entered is incorrect.");
 }
 
 $actual_password = mysql_result($result, 0, "Password");
 
 if($actual_password != $password) {
     header("HTTP/1.0 401 Unauthorized");
-    die("The username or password you entered is incorrect.\n");
+    die("The username or password you entered is incorrect.");
 }
 
 mysql_close($con);

@@ -1,22 +1,41 @@
 <?php
 
+$database = "mobile_artisans";
+
 $latitude = $_REQUEST["latitude"];
 $longitude = $_REQUEST["longitude"];
 $time= $_REQUEST["time"];
 $id = $_REQUEST["id"];
 
+if(empty($latitude) or empty($longitude)) {
+    header("HTTP/1.0 400 Bad Request");
+    die("Location attributes cannot be blank.");
+}
+
+if(empty($time)) {
+    header("HTTP/1.0 400 Bad Request");
+    die("Time cannot be blank.");
+}
+
+if(empty($id)) {
+    header("HTTP/1.0 400 Bad Request");
+    die("Username cannot be blank.");
+}
+
 $db_username = file_get_contents('./database_config.txt', NULL, NULL, 0, 11);
-$db_password = file_get_contents('./database_config.txt', NULL, NULL, 12, 15);
+$db_password = file_get_contents('./database_config.txt', NULL, NULL, 0, 15);
 $con = mysql_connect("localhost", $db_username, $db_password);
 
 if(!$con) {
+    header("HTTP/1.0 500 Internal Server Error");
     die('Could not connect: ' . mysql_error());
 }
 
-$db_selected = mysql_select_db("mobile_artisans", $con);
+$db_selected = mysql_select_db($database, $con);
 
 if(!$db_selected) {
-    die('Can\'t use mobile_artisans: ' . mysql_error());
+    header("HTTP/1.0 500 Internal Server Error");
+    die("Can\'t use '$database': " . mysql_error());
 }
 
 if(!table_exists("$id")) {
@@ -28,13 +47,13 @@ if(!table_exists("$id")) {
             Longitude FLOAT(14,10)
     )";
 
-    echo $sql;
-    $result = mysql_query($sql, $con);
-    if(!$result) {
-        $msg = 'Invalid query: ' . mysql_error() . "\n";
-        $msg .= 'Whole Query: ' . $sql;
-    }
 
+    $result = mysql_query($sql, $con);
+
+    if(!$result) {
+        header("HTTP/1.0 500 Internal Server Error");
+        die('Invalid Query: ' . mysql_error());
+    }
 }
 
 $sql = "INSERT INTO $id (Date, Latitude, Longitude) VALUES ('$time', '$latitude', '$longitude')";
@@ -42,10 +61,11 @@ $sql = "INSERT INTO $id (Date, Latitude, Longitude) VALUES ('$time', '$latitude'
 $result = mysql_query($sql, $con);
 
 if(!$result) {
-    echo "Error in inserting elements to the table: $id " . mysql_error() . "\n";
+    header("HTTP/1.0 400 Bad Request");
+    die("Only one location update is allowed at a given time.");
 }
 
-$list = mysql_list_tables("mobile_artisans");
+$list = mysql_list_tables($database);
 $i = 0;
 $idarray = array();
 $latarray = array();
