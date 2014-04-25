@@ -20,9 +20,6 @@ import org.apache.http.message.BasicNameValuePair;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by shashank on 4/21/14.
- */
 public class RegisterActivity extends Activity implements View.OnClickListener{
 
     private EditText editTextUsername;
@@ -33,7 +30,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_register);
         context = this;
 
         editTextUsername = (EditText) findViewById(R.id.editTextUsername);
@@ -56,8 +53,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
 
                 Toast.makeText(this, "Submit", Toast.LENGTH_LONG);
                 i = new Intent(context, MapActivity.class);
-                Credentials loginDetails = new Credentials(params[0], params[1]);
-                i.putExtra("Credentials", loginDetails);
                 startActivity(i);
                 break;
         }
@@ -98,7 +93,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
 
         @Override
         protected void onPostExecute(String result) {
-//            super.onPostExecute(result);
+            super.onPostExecute(result);
             delegate.LoginMessage(feedback);
         }
 

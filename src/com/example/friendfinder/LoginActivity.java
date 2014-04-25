@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,10 +12,8 @@ import android.widget.Toast;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -59,8 +56,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
 
                 Toast.makeText(this, "Sign In", Toast.LENGTH_LONG);
                 i = new Intent(context, MapActivity.class);
-                Credentials loginDetails = new Credentials(params[0], params[1]);
-                i.putExtra("Credentials", loginDetails);
                 startActivity(i);
                 break;
             case R.id.buttonRegister:
@@ -79,6 +74,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
     private static class LoginSession extends AsyncTask<String, Integer, String> {
         public LoginFeedback delegate;
         private String feedback = null;
+
         @Override
         protected String doInBackground(String... params) {
             String responseString = null;

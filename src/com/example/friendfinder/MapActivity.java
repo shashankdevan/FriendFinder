@@ -43,7 +43,7 @@ public class MapActivity extends Activity implements SendData {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_map);
         context = this;
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
