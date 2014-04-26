@@ -47,7 +47,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
 
     @Override
     public void onClick(View v) {
-        Intent i;
         switch (v.getId()) {
             case R.id.buttonSignIn:
                 params[0] = editTextUsername.getText().toString();
@@ -55,12 +54,9 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
                 LoginSession mySession = new LoginSession();
                 mySession.delegate = (DataReceiver) context;
                 mySession.execute(params);
-                i = new Intent(context, MapActivity.class);
-                i.putExtra("username", params[0]);
-                startActivity(i);
                 break;
             case R.id.buttonRegister:
-                i = new Intent(context, RegisterActivity.class);
+                Intent i = new Intent(context, RegisterActivity.class);
                 startActivity(i);
                 break;
         }
@@ -69,8 +65,13 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     @Override
     public void receive(ServerResponse response) {
         if (response != null) {
-            Toast.makeText(context, "body: " + response.getMessage(), Toast.LENGTH_LONG).show();
-            Toast.makeText(context, "code: " + response.getStatusCode(), Toast.LENGTH_LONG).show();
+            if (response.getStatusCode() == 200) {
+                Intent i = new Intent(context, MapActivity.class);
+                i.putExtra("username", params[0]);
+                startActivity(i);
+            } else {
+                Toast.makeText(context, response.getMessage(), Toast.LENGTH_LONG).show();
+            }
         }
     }
 
