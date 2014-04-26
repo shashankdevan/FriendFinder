@@ -45,7 +45,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
-        Intent i;
         switch (v.getId()) {
             case R.id.buttonSubmit:
                 params[0] = editTextUsername.getText().toString();
@@ -53,11 +52,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
                 RegisterSession mySession = new RegisterSession();
                 mySession.delegate = (DataReceiver) context;
                 mySession.execute(params);
-
-                Toast.makeText(context, "Submit", Toast.LENGTH_LONG);
-                i = new Intent(context, MapActivity.class);
-                i.putExtra("username", params[0]);
-                startActivity(i);
                 break;
         }
     }
@@ -65,8 +59,13 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
     @Override
     public void receive(ServerResponse response) {
         if (response != null) {
-            Toast.makeText(context, "body: " + response.getMessage(), Toast.LENGTH_LONG).show();
-            Toast.makeText(context, "code: " + response.getStatusCode(), Toast.LENGTH_LONG).show();
+            if (response.getStatusCode() == 200) {
+                Intent i = new Intent(context, MapActivity.class);
+                i.putExtra("username", params[0]);
+                startActivity(i);
+            } else {
+                Toast.makeText(context, response.getMessage(), Toast.LENGTH_LONG).show();
+            }
         }
     }
 
