@@ -39,21 +39,8 @@ if(!$db_selected) {
 }
 
 if(!table_exists("$id")) {
-
-    $sql = "CREATE TABLE $id (
-            Date DATETIME,
-            PRIMARY KEY(Date),
-            Latitude FLOAT(14,10),
-            Longitude FLOAT(14,10)
-    )";
-
-
-    $result = mysql_query($sql, $con);
-
-    if(!$result) {
-        header("HTTP/1.0 500 Internal Server Error");
-        die('Invalid Query: ' . mysql_error());
-    }
+    header("HTTP/1.0 400 Bad Request");
+    die("User does not exist.");
 }
 
 $sql = "INSERT INTO $id (Date, Latitude, Longitude) VALUES ('$time', '$latitude', '$longitude')";
