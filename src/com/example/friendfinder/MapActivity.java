@@ -42,6 +42,8 @@ public class MapActivity extends Activity implements DataReceiver {
     private GoogleMap map;
     private String username = null;
 
+    private Location userPosition;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,20 +62,8 @@ public class MapActivity extends Activity implements DataReceiver {
 
         @Override
         public void onLocationChanged(Location location) {
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-
-            setUserPosition(latitude, longitude);
+            userPosition = location;
             requestFriendLocations(location);
-        }
-
-        private void setUserPosition(double latitude, double longitude) {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 16));
-            map.clear();
-            map.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude))
-                    .title(username)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
         }
 
         private void requestFriendLocations(Location location) {
@@ -108,10 +98,20 @@ public class MapActivity extends Activity implements DataReceiver {
 
     @Override
     public void receive(ServerResponse response) {
-        if (response != null) {
-            Toast.makeText(context, "Friends:\n" + response.getMessage(), Toast.LENGTH_LONG).show();
+        displayUserPosition();
+        if (response != null)
             displayFriends(response.getMessage());
-        }
+    }
+
+    private void displayUserPosition() {
+        double latitude = userPosition.getLatitude();
+        double longitude = userPosition.getLongitude();
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 16));
+        map.clear();
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(latitude, longitude))
+                .title(username)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
     }
 
     private void displayFriends(String responseString) {
@@ -167,7 +167,6 @@ public class MapActivity extends Activity implements DataReceiver {
         @Override
         protected void onPostExecute(ServerResponse response) {
             super.onPostExecute(response);
-            Toast.makeText((Context) delegate, response.getMessage(), Toast.LENGTH_LONG).show();
             delegate.receive(response);
         }
 
