@@ -42,20 +42,28 @@ public class MapActivity extends Activity implements DataReceiver {
     private GoogleMap map;
     private String username = null;
 
+    private LocationManager locationManager;
+    private GpsListener listener;
     private Location userPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        context = this;
         username = getIntent().getStringExtra("username");
+        context = this;
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 
-        GpsListener listener = new GpsListener();
-        LocationManager locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
+        listener = new GpsListener();
+        locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 0, listener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(listener);
     }
 
     private class GpsListener implements LocationListener {
