@@ -62,6 +62,10 @@ $count = 0;
 
 while($i < mysql_num_rows($list)) {
     $tb_names[$i] = mysql_tablename($list, $i);
+    if($tb_names[$i] == "user" or $tb_names[$i] == $id) {
+        $i++;
+        continue;
+    }
     $sql = "SELECT * FROM $tb_names[$i] order by Date desc limit 1";
     $result = mysql_query($sql, $con);
     $num = mysql_numrows($result);
@@ -73,16 +77,15 @@ while($i < mysql_num_rows($list)) {
         $fieldlongitude = mysql_result($result, $j, "Longitude");
         $phpdate = strtotime($fielddate);
         $dist = distance($fieldlatitude, $fieldlongitude, $latitude, $longitude);
-       if($dist < 0.2) {
+        if($dist < 2) {
             $idarray[] = $tb_names[$i];
             $latarray[] = $fieldlatitude;
             $longarray[] = $fieldlongitude;
             $distarray[] = $dist;
             $count++;
-       }
+        }
         $j++;
     }
-
     $i++;
 }
 

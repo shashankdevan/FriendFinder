@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 
+import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -114,6 +115,7 @@ public class MapActivity extends Activity implements DataReceiver {
     @Override
     public void receive(ServerResponse response) {
         if (response != null) {
+            Toast.makeText(context, "Friends:\n" + response.getMessage(), Toast.LENGTH_LONG).show();
             displayFriends(response.getMessage());
         }
     }
@@ -123,12 +125,10 @@ public class MapActivity extends Activity implements DataReceiver {
 
         for (String line : lines) {
             String params[] = line.split(",");
-            if (params[0] != username) {
-                map.addMarker(new MarkerOptions()
-                        .position(new LatLng(Double.valueOf(params[1]), Double.valueOf(params[2])))
-                        .title(params[0])
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-            }
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(Double.valueOf(params[1]), Double.valueOf(params[2])))
+                    .title(params[0])
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
         }
     }
 
