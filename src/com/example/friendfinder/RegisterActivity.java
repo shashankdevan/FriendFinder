@@ -20,7 +20,7 @@ import org.apache.http.message.BasicNameValuePair;
 import java.util.LinkedList;
 import java.util.List;
 
-public class RegisterActivity extends Activity implements View.OnClickListener{
+public class RegisterActivity extends Activity implements View.OnClickListener, DataReceiver {
 
     private EditText editTextUsername;
     private EditText editTextPassword;
@@ -48,19 +48,25 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
                 params[0] = editTextUsername.getText().toString();
                 params[1] = editTextPassword.getText().toString();
                 RegisterSession mySession = new RegisterSession();
-                mySession.delegate = (LoginFeedback) context;
+                mySession.delegate = (DataReceiver) context;
                 mySession.execute(params);
 
-                Toast.makeText(this, "Submit", Toast.LENGTH_LONG);
+                Toast.makeText(context, "Submit", Toast.LENGTH_LONG);
                 i = new Intent(context, MapActivity.class);
                 startActivity(i);
                 break;
         }
     }
 
+    @Override
+    public void receive(String responseString) {
+        Toast.makeText(this, responseString, Toast.LENGTH_LONG);
+    }
+
     private static class RegisterSession extends AsyncTask<String, Integer, String> {
-        public LoginFeedback delegate;
+        public DataReceiver delegate;
         private String feedback = null;
+
         @Override
         protected String doInBackground(String... params) {
             String responseString = null;
@@ -94,7 +100,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            delegate.LoginMessage(feedback);
+            delegate.receive(feedback);
         }
 
         @Override

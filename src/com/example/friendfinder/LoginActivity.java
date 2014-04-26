@@ -20,7 +20,7 @@ import org.apache.http.message.BasicNameValuePair;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LoginActivity extends Activity implements View.OnClickListener, LoginFeedback {
+public class LoginActivity extends Activity implements View.OnClickListener, DataReceiver {
 
     private EditText editTextUsername;
     private EditText editTextPassword;
@@ -51,7 +51,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
                 params[0] = editTextUsername.getText().toString();
                 params[1] = editTextPassword.getText().toString();
                 LoginSession mySession = new LoginSession();
-                mySession.delegate = (LoginFeedback) context;
+                mySession.delegate = (DataReceiver) context;
                 mySession.execute(params);
 
                 Toast.makeText(this, "Sign In", Toast.LENGTH_LONG);
@@ -67,12 +67,12 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
     }
 
     @Override
-    public void LoginMessage(String responseString) {
+    public void receive(String responseString) {
         Toast.makeText(this, responseString, Toast.LENGTH_LONG);
     }
 
     private static class LoginSession extends AsyncTask<String, Integer, String> {
-        public LoginFeedback delegate;
+        public DataReceiver delegate;
         private String feedback = null;
 
         @Override
@@ -108,7 +108,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            delegate.LoginMessage(feedback);
+            delegate.receive(feedback);
         }
 
         @Override

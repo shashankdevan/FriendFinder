@@ -30,7 +30,7 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MapActivity extends Activity implements SendData {
+public class MapActivity extends Activity implements DataReceiver {
 
     private String[] params = new String[4];
     private Handler myHandler = new Handler();
@@ -101,12 +101,16 @@ public class MapActivity extends Activity implements SendData {
             params[2] = String.valueOf(location.getLongitude());
             params[3] = username;
             DownloadSession mySession = new DownloadSession();
-            mySession.delegate = (SendData) context;
+            mySession.delegate = (DataReceiver) context;
             mySession.execute(params);
         }
     }
 
-    public void displayFriends(String responseString) {
+    public void receive(String responseString) {
+        displayFriends(responseString);
+    }
+
+    private void displayFriends(String responseString) {
         String lines[] = responseString.split("\\r?\\n");
 
         for (String line : lines) {
@@ -121,7 +125,7 @@ public class MapActivity extends Activity implements SendData {
     }
 
     private static class DownloadSession extends AsyncTask<String, Integer, String> {
-        public SendData delegate;
+        public DataReceiver delegate;
 
         @Override
         protected String doInBackground(String... params) {
@@ -161,7 +165,7 @@ public class MapActivity extends Activity implements SendData {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            delegate.displayFriends(result);
+            delegate.receive(result);
         }
 
         @Override
