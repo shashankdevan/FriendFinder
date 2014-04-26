@@ -47,7 +47,7 @@ if($actual_password != $password) {
 
 mysql_close($con);
 
-print "Success!";
+print "Success";
 
 function table_exists($tablename, $database = false) {
     if(!$database) {

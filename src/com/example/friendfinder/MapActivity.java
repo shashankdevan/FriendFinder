@@ -16,6 +16,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -25,6 +26,9 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -107,8 +111,11 @@ public class MapActivity extends Activity implements DataReceiver {
         }
     }
 
-    public void receive(String responseString) {
-        displayFriends(responseString);
+    @Override
+    public void receive(ServerResponse response) {
+        if (response != null) {
+            displayFriends(response.getMessage());
+        }
     }
 
     private void displayFriends(String responseString) {
@@ -125,12 +132,12 @@ public class MapActivity extends Activity implements DataReceiver {
         }
     }
 
-    private static class DownloadSession extends AsyncTask<String, Integer, String> {
+    private static class DownloadSession extends AsyncTask<String, Integer, ServerResponse> {
         public DataReceiver delegate;
 
         @Override
-        protected String doInBackground(String... params) {
-            String responseString = null;
+        protected ServerResponse doInBackground(String... params) {
+            ServerResponse serverResponse = null;
             String[] parameters = params;
 
             String time = parameters[0];
@@ -154,19 +161,22 @@ public class MapActivity extends Activity implements DataReceiver {
             }
 
             try {
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                responseString = client.execute(post, responseHandler);
+                HttpResponse httpResponse = client.execute(post);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+                String responseString = reader.readLine();
+                serverResponse = new ServerResponse(httpResponse.getStatusLine().getStatusCode(), responseString);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            return responseString;
+            return serverResponse;
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            delegate.receive(result);
+        protected void onPostExecute(ServerResponse response) {
+            super.onPostExecute(response);
+            delegate.receive(response);
         }
 
         @Override

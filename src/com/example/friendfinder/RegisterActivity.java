@@ -17,6 +17,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,17 +63,19 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
     }
 
     @Override
-    public void receive(String responseString) {
-        Toast.makeText(this, responseString, Toast.LENGTH_LONG);
+    public void receive(ServerResponse response) {
+        if (response != null) {
+            Toast.makeText(context, "body: " + response.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "code: " + response.getStatusCode(), Toast.LENGTH_LONG).show();
+        }
     }
 
-    private static class RegisterSession extends AsyncTask<String, Integer, String> {
+    private static class RegisterSession extends AsyncTask<String, Integer, ServerResponse> {
         public DataReceiver delegate;
-        private String feedback = null;
 
         @Override
-        protected String doInBackground(String... params) {
-            String responseString = null;
+        protected ServerResponse doInBackground(String... params) {
+            ServerResponse serverResponse = null;
             String[] parameters = params;
 
             String username = parameters[0];
@@ -90,18 +95,20 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
             }
 
             try {
-                HttpResponse response = client.execute(post);
-                feedback = String.valueOf(response.getStatusLine().getReasonPhrase());
+                HttpResponse httpResponse = client.execute(post);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+                String responseString = reader.readLine();
+                serverResponse = new ServerResponse(httpResponse.getStatusLine().getStatusCode(), responseString);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return responseString;
+            return serverResponse;
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            delegate.receive(feedback);
+        protected void onPostExecute(ServerResponse response) {
+            super.onPostExecute(response);
+            delegate.receive(response);
         }
 
         @Override

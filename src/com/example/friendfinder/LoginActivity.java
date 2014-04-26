@@ -17,6 +17,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,14 +55,11 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
                 LoginSession mySession = new LoginSession();
                 mySession.delegate = (DataReceiver) context;
                 mySession.execute(params);
-
-                Toast.makeText(this, "Sign In", Toast.LENGTH_LONG);
                 i = new Intent(context, MapActivity.class);
                 i.putExtra("username", params[0]);
                 startActivity(i);
                 break;
             case R.id.buttonRegister:
-                Toast.makeText(this, "Register", Toast.LENGTH_LONG);
                 i = new Intent(context, RegisterActivity.class);
                 startActivity(i);
                 break;
@@ -68,17 +67,19 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     }
 
     @Override
-    public void receive(String responseString) {
-        Toast.makeText(this, responseString, Toast.LENGTH_LONG);
+    public void receive(ServerResponse response) {
+        if (response != null) {
+            Toast.makeText(context, "body: " + response.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "code: " + response.getStatusCode(), Toast.LENGTH_LONG).show();
+        }
     }
 
-    private static class LoginSession extends AsyncTask<String, Integer, String> {
+    private static class LoginSession extends AsyncTask<String, Integer, ServerResponse> {
         public DataReceiver delegate;
-        private String feedback = null;
 
         @Override
-        protected String doInBackground(String... params) {
-            String responseString = null;
+        protected ServerResponse doInBackground(String... params) {
+            ServerResponse serverResponse = null;
             String[] parameters = params;
 
             String username = parameters[0];
@@ -98,18 +99,20 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
             }
 
             try {
-                HttpResponse response = client.execute(post);
-                feedback = String.valueOf(response.getStatusLine().getReasonPhrase());
+                HttpResponse httpResponse = client.execute(post);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+                String responseString = reader.readLine();
+                serverResponse = new ServerResponse(httpResponse.getStatusLine().getStatusCode(), responseString);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return responseString;
+            return serverResponse;
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            delegate.receive(feedback);
+        protected void onPostExecute(ServerResponse response) {
+            super.onPostExecute(response);
+            delegate.receive(response);
         }
 
         @Override
