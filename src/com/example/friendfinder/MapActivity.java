@@ -45,6 +45,7 @@ public class MapActivity extends Activity implements DataReceiver {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         context = this;
+        username = getIntent().getStringExtra("username");
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 

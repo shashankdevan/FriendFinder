@@ -56,6 +56,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
 
                 Toast.makeText(this, "Sign In", Toast.LENGTH_LONG);
                 i = new Intent(context, MapActivity.class);
+                i.putExtra("username", params[0]);
                 startActivity(i);
                 break;
             case R.id.buttonRegister:

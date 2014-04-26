@@ -53,6 +53,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
 
                 Toast.makeText(context, "Submit", Toast.LENGTH_LONG);
                 i = new Intent(context, MapActivity.class);
+                i.putExtra("username", params[0]);
                 startActivity(i);
                 break;
         }
