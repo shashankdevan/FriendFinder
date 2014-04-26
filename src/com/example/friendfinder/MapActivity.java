@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 
+import android.util.Log;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,13 +38,9 @@ import java.util.List;
 
 public class MapActivity extends Activity implements DataReceiver {
 
-    private String[] params = new String[4];
-    private Handler myHandler = new Handler();
     private Context context;
-
     private GoogleMap map;
-
-    private String username = "elixir";
+    private String username = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +63,31 @@ public class MapActivity extends Activity implements DataReceiver {
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
 
+            setUserPosition(latitude, longitude);
+            requestFriendLocations(location);
+        }
+
+        private void setUserPosition(double latitude, double longitude) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 16));
             map.clear();
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude))
+                    .title(username)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        }
 
-            LocationSender task = new LocationSender(location);
-            myHandler.post(task);
+        private void requestFriendLocations(Location location) {
+            String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+            String[] params = new String[4];
+
+            params[0] = timeStamp;
+            params[1] = String.valueOf(location.getLatitude());
+            params[2] = String.valueOf(location.getLongitude());
+            params[3] = username;
+
+            DownloadSession mySession = new DownloadSession();
+            mySession.delegate = (DataReceiver) context;
+            mySession.execute(params);
         }
 
         @Override
@@ -89,26 +103,6 @@ public class MapActivity extends Activity implements DataReceiver {
         @Override
         public void onProviderDisabled(String provider) {
 
-        }
-    }
-
-    private class LocationSender implements Runnable {
-        Location location;
-
-        public LocationSender(Location location_) {
-            location = location_;
-        }
-
-        @Override
-        public void run() {
-            String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-            params[0] = timeStamp;
-            params[1] = String.valueOf(location.getLatitude());
-            params[2] = String.valueOf(location.getLongitude());
-            params[3] = username;
-            DownloadSession mySession = new DownloadSession();
-            mySession.delegate = (DataReceiver) context;
-            mySession.execute(params);
         }
     }
 
@@ -138,21 +132,15 @@ public class MapActivity extends Activity implements DataReceiver {
         @Override
         protected ServerResponse doInBackground(String... params) {
             ServerResponse serverResponse = null;
-            String[] parameters = params;
-
-            String time = parameters[0];
-            String latitude = parameters[1];
-            String longitude = parameters[2];
-            String id = parameters[3];
 
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost("http://mpss.csce.uark.edu/~devan/update.php");
 
             List<NameValuePair> value = new LinkedList<NameValuePair>();
-            value.add(new BasicNameValuePair("time", time));
-            value.add(new BasicNameValuePair("latitude", latitude));
-            value.add(new BasicNameValuePair("longitude", longitude));
-            value.add(new BasicNameValuePair("id", id));
+            value.add(new BasicNameValuePair("time", params[0]));
+            value.add(new BasicNameValuePair("latitude", params[1]));
+            value.add(new BasicNameValuePair("longitude", params[2]));
+            value.add(new BasicNameValuePair("id", params[3]));
 
             try {
                 post.setEntity(new UrlEncodedFormEntity(value));
@@ -163,7 +151,10 @@ public class MapActivity extends Activity implements DataReceiver {
             try {
                 HttpResponse httpResponse = client.execute(post);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
-                String responseString = reader.readLine();
+                String responseLine;
+                String responseString = "";
+                while ((responseLine = reader.readLine()) != null)
+                    responseString += responseLine + "\n";
                 serverResponse = new ServerResponse(httpResponse.getStatusLine().getStatusCode(), responseString);
 
             } catch (Exception e) {
@@ -176,6 +167,7 @@ public class MapActivity extends Activity implements DataReceiver {
         @Override
         protected void onPostExecute(ServerResponse response) {
             super.onPostExecute(response);
+            Toast.makeText((Context) delegate, response.getMessage(), Toast.LENGTH_LONG).show();
             delegate.receive(response);
         }
 
