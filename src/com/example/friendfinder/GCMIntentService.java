@@ -24,6 +24,11 @@ public class GCMIntentService extends GCMBaseIntentService {
     }
 
     @Override
+    protected void onUnregistered(Context context, String registrationId) {
+        BackendServer.unregister(context, registrationId);
+    }
+
+    @Override
     protected void onMessage(Context context, Intent intent) {
 
     }
@@ -33,8 +38,4 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     }
 
-    @Override
-    protected void onUnregistered(Context context, String s) {
-
-    }
 }

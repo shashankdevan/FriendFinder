@@ -23,7 +23,7 @@ public class BackendServer {
     static final String TAG = "SERVER";
 
     static ServerResponse register(final Context context, String username, String password, String registrationId) {
-        Log.i(TAG, "regId = " + registrationId);
+        Log.i(TAG, "Registering the device");
 
         ServerResponse serverResponse = null;
         HttpClient client = new DefaultHttpClient();
@@ -50,5 +50,10 @@ public class BackendServer {
         }
         GCMRegistrar.setRegisteredOnServer(context, true);
         return serverResponse;
+    }
+
+    static void unregister(final Context context, final String regId) {
+        Log.i(TAG, "Unregistering the device");
+        GCMRegistrar.setRegisteredOnServer(context, false);
     }
 }
