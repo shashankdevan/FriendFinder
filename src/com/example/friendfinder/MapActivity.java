@@ -9,6 +9,8 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.util.Log;
+import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
