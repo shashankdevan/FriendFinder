@@ -96,17 +96,19 @@ for ($i = 0; $i < $count; $i++) {
     print "\n";
 }
 
+$reg_ids = array();
 
-$sql = "SELECT RegistrationId FROM user where Username='$id'";
-$result = mysql_query($sql, $con);
-$reg_id = mysql_result($result, 0, "RegistrationId");
-$user = mysql_result($result, 0, "Username");
+for ($i = 0; $i < $count; $i++) {
+    $sql = "SELECT RegistrationId FROM user where Username='$idarray[$i]'";
+    $result = mysql_query($sql, $con);
+    $reg_ids[] = mysql_result($result, 0, "RegistrationId");
+}
 
-$reg_ids = array($reg_id);
-$message = array("friend" => "$user is nearby. Do you want to see their location?" );
-$result = send_notification($reg_ids, $message);
+$message = array("username" => $id, "latitude" => $latitude, "longitude" => $longitude);
+send_notification($reg_ids, $message);
 
 mysql_close($con);
+
 
 function distance($lat1, $long1, $lat2, $long2) {
     $theta = $lon1 - $lon2;
