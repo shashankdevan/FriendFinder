@@ -22,6 +22,8 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.example.friendfinder.Global.LOGIN_URL;
+
 public class LoginActivity extends Activity implements View.OnClickListener, DataReceiver {
 
     private EditText editTextUsername;
@@ -87,7 +89,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
             String password = parameters[1];
 
             HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost("http://mpss.csce.uark.edu/~devan/login.php");
+            HttpPost post = new HttpPost(LOGIN_URL);
 
             List<NameValuePair> value = new LinkedList<NameValuePair>();
             value.add(new BasicNameValuePair("username", username));

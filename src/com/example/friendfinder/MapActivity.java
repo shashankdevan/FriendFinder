@@ -8,10 +8,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 
-import android.util.Log;
-import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -21,20 +18,19 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.example.friendfinder.Global.UPDATE_URL;
 
 public class MapActivity extends Activity implements DataReceiver {
 
@@ -146,7 +142,7 @@ public class MapActivity extends Activity implements DataReceiver {
             ServerResponse serverResponse = null;
 
             HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost("http://mpss.csce.uark.edu/~devan/update.php");
+            HttpPost post = new HttpPost(UPDATE_URL);
 
             List<NameValuePair> value = new LinkedList<NameValuePair>();
             value.add(new BasicNameValuePair("time", params[0]));

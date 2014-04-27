@@ -16,7 +16,7 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.example.friendfinder.Global.SERVER_URL;
+import static com.example.friendfinder.Global.REGISTER_URL;
 
 public class BackendServer {
 
@@ -27,7 +27,7 @@ public class BackendServer {
 
         ServerResponse serverResponse = null;
         HttpClient client = new DefaultHttpClient();
-        HttpPost post = new HttpPost(SERVER_URL);
+        HttpPost post = new HttpPost(REGISTER_URL);
 
         List<NameValuePair> value = new LinkedList<NameValuePair>();
         value.add(new BasicNameValuePair("username", username));
