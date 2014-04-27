@@ -92,8 +92,7 @@ while($i < mysql_num_rows($list)) {
 for ($i = 0; $i < $count; $i++) {
     print "$idarray[$i],";
     print "$latarray[$i],";
-    print "$longarray[$i],";
-    print "$distarray[$i]";
+    print "$longarray[$i]";
     print "\n";
 }
 
@@ -101,9 +100,10 @@ for ($i = 0; $i < $count; $i++) {
 $sql = "SELECT RegistrationId FROM user where Username='$id'";
 $result = mysql_query($sql, $con);
 $reg_id = mysql_result($result, 0, "RegistrationId");
+$user = mysql_result($result, 0, "Username");
 
 $reg_ids = array($reg_id);
-$message = array("price" => "Looks like things are working.");
+$message = array("friend" => "$user is nearby. Do you want to see their location?" );
 $result = send_notification($reg_ids, $message);
 
 mysql_close($con);
