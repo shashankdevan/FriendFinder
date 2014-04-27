@@ -1,8 +1,10 @@
 package com.example.friendfinder;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +14,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.google.android.gcm.GCMRegistrar;
 
+import static com.example.friendfinder.Global.MESSAGE;
+import static com.example.friendfinder.Global.DISPLAY_MESSAGE_ACTION;
 import static com.example.friendfinder.Global.SENDER_ID;
 
 public class RegisterActivity extends Activity implements View.OnClickListener, DataReceiver {
@@ -36,6 +40,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
 
+        registerReceiver(messageReceiver, new IntentFilter(DISPLAY_MESSAGE_ACTION));
         buttonSubmit.setOnClickListener(this);
     }
 
@@ -89,5 +94,19 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
             super.onPostExecute(response);
             delegate.receive(response);
         }
+    }
+
+    private final BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(context, intent.getExtras().getString(MESSAGE), Toast.LENGTH_LONG).show();
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(messageReceiver);
+        GCMRegistrar.onDestroy(this);
+        super.onDestroy();
     }
 }

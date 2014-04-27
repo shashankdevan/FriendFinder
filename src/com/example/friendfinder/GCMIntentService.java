@@ -20,10 +20,20 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     protected void onRegistered(Context context, String registrationId) {
-        Log.d(TAG, "On registered");
-        ServerResponse serverResponse = BackendServer
+        Log.d(TAG, "On registered callback");
+        ServerResponse response = BackendServer
                 .register(context, RegisterActivity.username, RegisterActivity.password, registrationId);
-        Log.d(TAG, serverResponse.getMessage());
+
+        if (response != null) {
+            if (response.getStatusCode() == 200) {
+                Intent i = new Intent(context, MapActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra("username", RegisterActivity.username);
+                startActivity(i);
+            } else {
+                Global.displayMessage(context, response.getMessage());
+            }
+        }
     }
 
     @Override

@@ -1,10 +1,21 @@
 package com.example.friendfinder;
 
+import android.content.Context;
+import android.content.Intent;
+
 public final class Global {
 
     static final String SENDER_ID = "83386399536";
     static final String REGISTER_URL = "http://mpss.csce.uark.edu/~devan/register.php";
     static final String LOGIN_URL = "http://mpss.csce.uark.edu/~devan/login.php";
     static final String UPDATE_URL = "http://mpss.csce.uark.edu/~devan/update.php";
+    static final String DISPLAY_MESSAGE_ACTION = "com.example.friendfinder.DISPLAY_MESSAGE";
+    static final String MESSAGE = "message";
+
+    static void displayMessage(Context context, String message) {
+        Intent intent = new Intent(DISPLAY_MESSAGE_ACTION);
+        intent.putExtra(MESSAGE, message);
+        context.sendBroadcast(intent);
+    }
 
 }
