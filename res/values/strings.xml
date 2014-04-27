@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Friend Finder</string>
     <string name="submit">Submit</string>
+    <string name="notification_message">is nearby. Do you want see their location?</string>
 </resources>

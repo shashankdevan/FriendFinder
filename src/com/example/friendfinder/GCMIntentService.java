@@ -43,7 +43,8 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     protected void onMessage(Context context, Intent intent) {
-        String message = intent.getExtras().getString("username");
+        String username = intent.getExtras().getString("username");
+        String message = username + " " + getString(R.string.notification_message);
         generateNotification(context, message);
     }
 
