@@ -11,6 +11,7 @@ public final class Global {
     static final String UPDATE_URL = "http://mpss.csce.uark.edu/~devan/update.php";
     static final String DISPLAY_MESSAGE_ACTION = "com.example.friendfinder.DISPLAY_MESSAGE";
     static final String MESSAGE = "message";
+    static final String USERNAME = "username";
 
     static void displayMessage(Context context, String message) {
         Intent intent = new Intent(DISPLAY_MESSAGE_ACTION);

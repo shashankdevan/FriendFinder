@@ -17,6 +17,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import static com.example.friendfinder.Global.USERNAME;
+
 public class MapActivity extends Activity implements DataReceiver {
 
     static final String TAG = "MAP";
@@ -33,7 +35,7 @@ public class MapActivity extends Activity implements DataReceiver {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        username = getIntent().getStringExtra("username");
+        username = getIntent().getStringExtra(USERNAME);
         context = this;
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();

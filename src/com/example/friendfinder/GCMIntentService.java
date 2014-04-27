@@ -9,6 +9,7 @@ import android.util.Log;
 import com.google.android.gcm.GCMBaseIntentService;
 
 import static com.example.friendfinder.Global.SENDER_ID;
+import static com.example.friendfinder.Global.USERNAME;
 
 public class GCMIntentService extends GCMBaseIntentService {
 
@@ -20,7 +21,6 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     protected void onRegistered(Context context, String registrationId) {
-        Log.d(TAG, "On registered callback");
         ServerResponse response = BackendServer
                 .register(context, RegisterActivity.username, RegisterActivity.password, registrationId);
 
@@ -28,7 +28,7 @@ public class GCMIntentService extends GCMBaseIntentService {
             if (response.getStatusCode() == 200) {
                 Intent i = new Intent(context, MapActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra("username", RegisterActivity.username);
+                i.putExtra(USERNAME, RegisterActivity.username);
                 startActivity(i);
             } else {
                 Global.displayMessage(context, response.getMessage());
@@ -43,7 +43,6 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     protected void onMessage(Context context, Intent intent) {
-        Log.i(TAG, "Received message");
         String message = intent.getExtras().getString("username");
         generateNotification(context, message);
     }

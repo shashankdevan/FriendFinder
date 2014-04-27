@@ -14,9 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.google.android.gcm.GCMRegistrar;
 
-import static com.example.friendfinder.Global.MESSAGE;
-import static com.example.friendfinder.Global.DISPLAY_MESSAGE_ACTION;
-import static com.example.friendfinder.Global.SENDER_ID;
+import static com.example.friendfinder.Global.*;
 
 public class RegisterActivity extends Activity implements View.OnClickListener, DataReceiver {
 
@@ -73,7 +71,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         if (response != null) {
             if (response.getStatusCode() == 200) {
                 Intent i = new Intent(context, MapActivity.class);
-                i.putExtra("username", username);
+                i.putExtra(USERNAME, username);
                 startActivity(i);
             } else {
                 Toast.makeText(context, response.getMessage(), Toast.LENGTH_LONG).show();

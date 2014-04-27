@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.example.friendfinder.Global.LOGIN_URL;
+import static com.example.friendfinder.Global.USERNAME;
 
 public class LoginActivity extends Activity implements View.OnClickListener, DataReceiver {
 
@@ -69,7 +70,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
         if (response != null) {
             if (response.getStatusCode() == 200) {
                 Intent i = new Intent(context, MapActivity.class);
-                i.putExtra("username", params[0]);
+                i.putExtra(USERNAME, params[0]);
                 startActivity(i);
             } else {
                 Toast.makeText(context, response.getMessage(), Toast.LENGTH_LONG).show();
