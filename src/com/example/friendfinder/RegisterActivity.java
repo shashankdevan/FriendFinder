@@ -2,33 +2,27 @@ package com.example.friendfinder;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+import com.google.android.gcm.GCMRegistrar;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.List;
+import static com.example.friendfinder.Global.SENDER_ID;
 
-public class RegisterActivity extends Activity implements View.OnClickListener, DataReceiver {
+public class RegisterActivity extends Activity implements View.OnClickListener {
+
+    static final String TAG = "REGISTER";
 
     private EditText editTextUsername;
     private EditText editTextPassword;
     private Button buttonSubmit;
-    private String[] params = new String[2];
+
+    public static String username = null;
+    public static String password = null;
+
     Context context;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -47,78 +41,33 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonSubmit:
-                params[0] = editTextUsername.getText().toString();
-                params[1] = editTextPassword.getText().toString();
-                RegisterSession mySession = new RegisterSession();
-                mySession.delegate = (DataReceiver) context;
-                mySession.execute(params);
+                username = editTextUsername.getText().toString();
+                password = editTextPassword.getText().toString();
+
+                GCMRegistrar.checkDevice(this);
+                final String regId = GCMRegistrar.getRegistrationId(this);
+
+                Log.d(TAG, regId);
+
+                if (regId.equals("")) {
+                    GCMRegistrar.register(this, SENDER_ID);
+                } else {
+                    AsyncTask<Void, Void, ServerResponse> registerTask = new AsyncTask<Void, Void, ServerResponse>() {
+                        @Override
+                        protected ServerResponse doInBackground(Void... params) {
+                            return BackendServer.register(context, username, password, regId);
+                        }
+
+                        @Override
+                        protected void onPostExecute(ServerResponse response) {
+                            super.onPostExecute(response);
+                            Log.d(TAG, response.getMessage());
+                        }
+                    };
+                    registerTask.execute(null, null, null);
+                }
                 break;
         }
     }
 
-    @Override
-    public void receive(ServerResponse response) {
-        if (response != null) {
-            if (response.getStatusCode() == 200) {
-                Intent i = new Intent(context, MapActivity.class);
-                i.putExtra("username", params[0]);
-                startActivity(i);
-            } else {
-                Toast.makeText(context, response.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private static class RegisterSession extends AsyncTask<String, Integer, ServerResponse> {
-        public DataReceiver delegate;
-
-        @Override
-        protected ServerResponse doInBackground(String... params) {
-            ServerResponse serverResponse = null;
-            String[] parameters = params;
-
-            String username = parameters[0];
-            String password = parameters[1];
-
-            HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost("http://mpss.csce.uark.edu/~devan/register.php");
-
-            List<NameValuePair> value = new LinkedList<NameValuePair>();
-            value.add(new BasicNameValuePair("username", username));
-            value.add(new BasicNameValuePair("password", password));
-
-            try {
-                post.setEntity(new UrlEncodedFormEntity(value));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
-                HttpResponse httpResponse = client.execute(post);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
-                String responseString = reader.readLine();
-                serverResponse = new ServerResponse(httpResponse.getStatusLine().getStatusCode(), responseString);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return serverResponse;
-        }
-
-        @Override
-        protected void onPostExecute(ServerResponse response) {
-            super.onPostExecute(response);
-            delegate.receive(response);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-        }
-
-    }
 }

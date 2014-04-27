@@ -2,10 +2,16 @@
 
 $username = $_REQUEST["username"];
 $password = $_REQUEST["password"];
+$registration_id = $_REQUEST["registrationId"];
 
 if(empty($username) or empty($password)) {
     header("HTTP/1.0 400 Bad Request");
     die("Username or Password cannot be blank.");
+}
+
+if(empty($registration_id)) {
+    header("HTTP/1.0 400 Bad Request");
+    die("Registration Id cannot be blank.");
 }
 
 $db_username = file_get_contents('./database_config.txt', NULL, NULL, 0, 11);
@@ -29,7 +35,8 @@ if(!table_exists("user")) {
     $sql = "CREATE TABLE user (
             Username VARCHAR(32),
             PRIMARY KEY(Username),
-            Password VARCHAR(32)
+            Password VARCHAR(32),
+            RegistrationId VARCHAR(255)
     )";
 
 
@@ -41,7 +48,7 @@ if(!table_exists("user")) {
     }
 }
 
-$sql = "INSERT INTO user (Username, Password) VALUES ('$username', '$password')";
+$sql = "INSERT INTO user (Username, Password, RegistrationId) VALUES ('$username', '$password', '$registration_id')";
 
 $result = mysql_query($sql, $con);
 
