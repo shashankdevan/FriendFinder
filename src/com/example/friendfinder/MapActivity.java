@@ -38,6 +38,8 @@ import java.util.List;
 
 public class MapActivity extends Activity implements DataReceiver {
 
+    static final String TAG = "MAP";
+
     private Context context;
     private GoogleMap map;
     private String username = null;
@@ -126,6 +128,8 @@ public class MapActivity extends Activity implements DataReceiver {
         String lines[] = responseString.split("\\r?\\n");
 
         for (String line : lines) {
+            if (line.isEmpty())
+                break;
             String params[] = line.split(",");
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.valueOf(params[1]), Double.valueOf(params[2])))
