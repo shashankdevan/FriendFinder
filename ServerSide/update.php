@@ -97,6 +97,15 @@ for ($i = 0; $i < $count; $i++) {
     print "\n";
 }
 
+
+$sql = "SELECT RegistrationId FROM user where Username='$id'";
+$result = mysql_query($sql, $con);
+$reg_id = mysql_result($result, 0, "RegistrationId");
+
+$reg_ids = array($reg_id);
+$message = array("price" => "Looks like things are working.");
+$result = send_notification($reg_ids, $message);
+
 mysql_close($con);
 
 function distance($lat1, $long1, $lat2, $long2) {
