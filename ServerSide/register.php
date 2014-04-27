@@ -57,9 +57,18 @@ if(!$result) {
     die("Username already exists.");
 }
 
+$sql = "CREATE TABLE $username (Date DATETIME, PRIMARY KEY(Date), Latitude FLOAT(14,10), Longitude FLOAT(14,10))";
+
+$result = mysql_query($sql, $con);
+
+if(!$result) {
+    header("HTTP/1.0 500 Internal Server Error");
+    die('Invalid Query: ' . mysql_error());
+}
+
 mysql_close($con);
 
-print("Success!");
+print("Success");
 
 function table_exists($tablename, $database = false) {
     if(!$database) {
