@@ -6,33 +6,16 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
-import android.util.Log;
-import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-
-import static com.example.friendfinder.Global.UPDATE_URL;
 
 public class MapActivity extends Activity implements DataReceiver {
 
@@ -83,7 +66,7 @@ public class MapActivity extends Activity implements DataReceiver {
             params[2] = String.valueOf(location.getLongitude());
             params[3] = username;
 
-            DownloadSession mySession = new DownloadSession();
+            UpdateSession mySession = new UpdateSession();
             mySession.delegate = (DataReceiver) context;
             mySession.execute(params);
         }
@@ -134,64 +117,6 @@ public class MapActivity extends Activity implements DataReceiver {
                     .title(params[0])
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
         }
-    }
-
-    private static class DownloadSession extends AsyncTask<String, Integer, ServerResponse> {
-        public DataReceiver delegate;
-
-        @Override
-        protected ServerResponse doInBackground(String... params) {
-            ServerResponse serverResponse = null;
-
-            HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost(UPDATE_URL);
-
-            List<NameValuePair> value = new LinkedList<NameValuePair>();
-            value.add(new BasicNameValuePair("time", params[0]));
-            value.add(new BasicNameValuePair("latitude", params[1]));
-            value.add(new BasicNameValuePair("longitude", params[2]));
-            value.add(new BasicNameValuePair("id", params[3]));
-
-            try {
-                post.setEntity(new UrlEncodedFormEntity(value));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
-                HttpResponse httpResponse = client.execute(post);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
-                String responseLine;
-                String responseString = "";
-                while ((responseLine = reader.readLine()) != null)
-                    responseString += responseLine + "\n";
-                serverResponse = new ServerResponse(httpResponse.getStatusLine().getStatusCode(), responseString);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return serverResponse;
-        }
-
-        @Override
-        protected void onPostExecute(ServerResponse response) {
-            super.onPostExecute(response);
-            delegate.receive(response);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            // TODO Auto-generated method stub
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            // TODO Auto-generated method stub
-            super.onProgressUpdate(values);
-        }
-
     }
 
 }
