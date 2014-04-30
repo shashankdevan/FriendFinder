@@ -20,9 +20,11 @@ public class GCMIntentService extends GCMBaseIntentService {
     static String tickerText = null;
     static String bigText = "This is expanded text This is expanded text This is expanded text This is expanded text";
     static String notification_title = "Friend Finder";
+    public SharedPreferences preferences;
     public GCMIntentService() {
         super(SENDER_ID);
     }
+
 
     @Override
     protected void onRegistered(Context context, String registrationId) {
@@ -61,17 +63,16 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     private void generateNotification(Context context, String message) {
 
-        if (MapActivity.currentUser != null) {
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (preferences.getString(USERNAME, "") != "") {
             int icon = R.drawable.ic_launcher;
             long when = System.currentTimeMillis();
-//        SharedPreferences log = PreferenceManager.getDefaultSharedPreferences(this);
 
             Intent notificationIntent = new Intent(context, MapActivity.class);
             notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//        notificationIntent.putExtra(USERNAME, log.getString("username", ""));
-            Log.d(TAG, "Username in generate notification : " + MapActivity.currentUser);
-            notificationIntent.putExtra(USERNAME, MapActivity.currentUser);
-            notificationIntent.putExtra("NOTIFICATION", "Notified");
+
+            notificationIntent.putExtra(USERNAME, preferences.getString(USERNAME, ""));
             PendingIntent p_intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
             Notification notification = new Notification.Builder(context)
@@ -89,9 +90,5 @@ public class GCMIntentService extends GCMBaseIntentService {
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             notificationManager.notify(0, notification);
         }
-        else{
-            Log.d(TAG, "User not logged in! Not being notified!");
-        }
-
     }
 }

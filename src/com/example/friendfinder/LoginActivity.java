@@ -35,6 +35,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     private Button buttonRegister;
     private String[] params = new String[2];
     Context context;
+    public SharedPreferences preferences;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,10 +72,11 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     public void receive(ServerResponse response) {
         if (response != null) {
             if (response.getStatusCode() == 200) {
-                MapActivity.currentUser = params[0];
-                SharedPreferences log = PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = log.edit();
-                editor.putString("username", params[0]);
+//                MapActivity.currentUser = params[0];
+                preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(USERNAME, params[0]);
+                editor.commit();
 
                 Intent i = new Intent(context, MapActivity.class);
                 i.putExtra(USERNAME, params[0]);
@@ -141,7 +143,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
 
     protected void onDestroy(){
         super.onDestroy();
-        MapActivity.currentUser = null;
+
     }
 
 }

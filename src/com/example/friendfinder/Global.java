@@ -12,6 +12,9 @@ public final class Global {
     static final String DISPLAY_MESSAGE_ACTION = "com.example.friendfinder.DISPLAY_MESSAGE";
     static final String MESSAGE = "message";
     static final String USERNAME = "username";
+    static final String LATITUDE = "latitude";
+    static final String LONGITUDE = "longitude";
+    static final String ZOOM = "zoom";
 
     static void displayMessage(Context context, String message) {
         Intent intent = new Intent(DISPLAY_MESSAGE_ACTION);
