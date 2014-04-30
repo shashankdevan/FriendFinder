@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -38,15 +40,13 @@ public class MapActivity extends Activity implements DataReceiver {
 
     private Context context;
     private GoogleMap map;
-    private static String username = null;
 
     private LocationManager locationManager;
     private GpsListener listener;
     private Location userPosition;
     public static CameraPosition lastMapLocation;
     public SharedPreferences preferences;
-
-//    public static String currentUser;
+    public LocationDirectoryOpenHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +55,12 @@ public class MapActivity extends Activity implements DataReceiver {
         Log.d(TAG, "On Create");
 
         setContentView(R.layout.activity_map);
-        username = getIntent().getStringExtra(USERNAME);
         context = this;
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        /* Create android database for storing friend locations
+         */
+        databaseHelper = new LocationDirectoryOpenHelper(context);
 
         /* Check if GPS is enabled, if not
         prompt the user the enable GPS
@@ -148,7 +151,7 @@ public class MapActivity extends Activity implements DataReceiver {
         params[0] = timeStamp;
         params[1] = String.valueOf(location.getLatitude());
         params[2] = String.valueOf(location.getLongitude());
-        params[3] = username;
+        params[3] = preferences.getString(USERNAME,"");
 
         UpdateSession mySession = new UpdateSession();
         mySession.delegate = (DataReceiver) context;
@@ -168,7 +171,6 @@ public class MapActivity extends Activity implements DataReceiver {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putLong(LATITUDE, (long) location.getLatitude());
             editor.putLong(LONGITUDE, (long) location.getLongitude());
-//            editor.putInt(ZOOM, )
             editor.commit();
         }
 
@@ -190,9 +192,25 @@ public class MapActivity extends Activity implements DataReceiver {
 
     @Override
     public void receive(ServerResponse response) {
+
+        SQLiteDatabase database = databaseHelper.getWritableDatabase();
+        String responseString = response.getMessage();
+        String lines[] = responseString.split("\\r?\\n");
+
+        for (String line : lines){
+            if (line.isEmpty())
+                break;
+            String params[] = line.split(",");
+            Log.d(TAG, params.length + " " + line);
+            database.execSQL("INSERT INTO friend_locations (username, latitude, longitude) VALUES ('" +
+                    params[0] + "', " +
+                    params[1] + ", " +
+                    params[2] + ")");
+        }
+
         displayUserPosition();
         if (response != null)
-            displayFriends(response.getMessage());
+            displayFriends();
     }
 
     private void displayUserPosition() {
@@ -202,38 +220,50 @@ public class MapActivity extends Activity implements DataReceiver {
         map.clear();
         map.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
-                .title(username)
+                .title(preferences.getString(USERNAME,""))
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
     }
 
-    private void displayFriends(String responseString) {
-        String lines[] = responseString.split("\\r?\\n");
+    private void displayFriends() {
 
-        for (String line : lines) {
-            if (line.isEmpty())
-                break;
-            String params[] = line.split(",");
-            Log.d(TAG, params.length + " " + line);
+        String uname, lat, lng;
+        SQLiteDatabase database = databaseHelper.getReadableDatabase();
+        String sql = "SELECT username, latitude, longitude FROM friend_locations";
+        Cursor result = database.rawQuery(sql, null);
+
+        result.moveToFirst();
+        while (result.isAfterLast() == false) {
+            uname = result.getString(0);
+            lat = result.getString(1);
+            lng = result.getString(2);
+            Log.d(TAG, uname + " " + lat + " " + lng);
+
             map.addMarker(new MarkerOptions()
-                    .position(new LatLng(Double.valueOf(params[1]), Double.valueOf(params[2])))
-                    .title(params[0])
+                    .position(new LatLng(Double.valueOf(lat), Double.valueOf(lng)))
+                    .title(uname)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            result.moveToNext();
         }
+        result.close();
     }
 
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
         setIntent(intent);
-        Toast.makeText(this, "Updating map after notification", Toast.LENGTH_LONG).show();
+        String incoming_username = intent.getStringExtra(USERNAME);
+        String latitude = intent.getStringExtra(LATITUDE);
+        String longitude = intent.getStringExtra(LONGITUDE);
+        Toast.makeText(this, "Notification from " + incoming_username + " at " + latitude + ", " + longitude, Toast.LENGTH_LONG).show();
 
-        username = getIntent().getStringExtra(USERNAME);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastMapLocation.target.latitude,lastMapLocation.target.longitude), 16));
+        /*put this new incoming user in database and make a call to displayUser and displayFriends
+         */
+//        username = getIntent().getStringExtra(USERNAME);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(preferences.getLong(LATITUDE, 0),preferences.getLong(LONGITUDE, 0)), 16));
     }
 
     protected void onStop(){
         super.onStop();
-        //code to kill the LoginActivity when you press BACK button here
         Log.d(TAG, "onStop");
         Toast.makeText(this, "onStop MapActivity", Toast.LENGTH_LONG).show();
         lastMapLocation = map.getCameraPosition();

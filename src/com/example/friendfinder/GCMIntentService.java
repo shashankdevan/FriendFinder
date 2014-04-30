@@ -10,15 +10,11 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import com.google.android.gcm.GCMBaseIntentService;
 
-import static com.example.friendfinder.Global.LOGIN_URL;
-import static com.example.friendfinder.Global.SENDER_ID;
-import static com.example.friendfinder.Global.USERNAME;
+import static com.example.friendfinder.Global.*;
 
 public class GCMIntentService extends GCMBaseIntentService {
 
     static final String TAG = "SERVICE";
-    static String tickerText = null;
-    static String bigText = "This is expanded text This is expanded text This is expanded text This is expanded text";
     static String notification_title = "Friend Finder";
     public SharedPreferences preferences;
     public GCMIntentService() {
@@ -51,9 +47,9 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     protected void onMessage(Context context, Intent intent) {
         String username = intent.getExtras().getString("username");
-        tickerText = username + " is nearby!";
-        String message = username + " is nearby. See " + username + "?";
-        generateNotification(context, message);
+        String lat = intent.getExtras().getString("latitude");
+        String lng = intent.getExtras().getString("longitude");
+        generateNotification(context, username, lat, lng);
     }
 
     @Override
@@ -61,8 +57,10 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     }
 
-    private void generateNotification(Context context, String message) {
+    private void generateNotification(Context context, String username, String lat, String lng) {
 
+        String message = username + " is nearby. See " + username + "?";
+        String tickerText = username + " is nearby!";
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (preferences.getString(USERNAME, "") != "") {
@@ -72,13 +70,14 @@ public class GCMIntentService extends GCMBaseIntentService {
             Intent notificationIntent = new Intent(context, MapActivity.class);
             notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-            notificationIntent.putExtra(USERNAME, preferences.getString(USERNAME, ""));
+            notificationIntent.putExtra(USERNAME, username);
+            notificationIntent.putExtra(LATITUDE, lat);
+            notificationIntent.putExtra(LONGITUDE, lng);
             PendingIntent p_intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
             Notification notification = new Notification.Builder(context)
                     .setContentTitle(notification_title)
                     .setContentText(message)
-                    .setStyle(new Notification.BigTextStyle().bigText(bigText))
                     .setSmallIcon(icon)
                     .setWhen(when)
                     .setTicker(tickerText)

@@ -1,11 +1,14 @@
 package com.example.friendfinder;
 
 import android.app.Activity;
+import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
@@ -57,7 +60,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
             case R.id.buttonSignIn:
                 params[0] = editTextUsername.getText().toString();
                 params[1] = editTextPassword.getText().toString();
-                LoginSession mySession = new LoginSession();
+                LoginSession mySession = new LoginSession(context);
                 mySession.delegate = (DataReceiver) context;
                 mySession.execute(params);
                 break;
@@ -72,7 +75,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     public void receive(ServerResponse response) {
         if (response != null) {
             if (response.getStatusCode() == 200) {
-//                MapActivity.currentUser = params[0];
                 preferences = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(USERNAME, params[0]);
@@ -89,7 +91,15 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     }
 
     private static class LoginSession extends AsyncTask<String, Integer, ServerResponse> {
+        private final Context LoginSessionContext;
         public DataReceiver delegate;
+
+        private ProgressDialog dialog;
+        public LoginSession(Context context) {
+            LoginSessionContext = context;
+            dialog = new ProgressDialog(LoginSessionContext);
+        }
+
 
         @Override
         protected ServerResponse doInBackground(String... params) {
@@ -127,11 +137,15 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
         protected void onPostExecute(ServerResponse response) {
             super.onPostExecute(response);
             delegate.receive(response);
+            if (dialog.isShowing())
+                dialog.dismiss();
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            this.dialog.setMessage("Signing in..");
+            this.dialog.show();
         }
 
         @Override
