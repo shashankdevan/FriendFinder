@@ -3,8 +3,10 @@ package com.example.friendfinder;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -69,9 +71,15 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     public void receive(ServerResponse response) {
         if (response != null) {
             if (response.getStatusCode() == 200) {
+                MapActivity.currentUser = params[0];
+                SharedPreferences log = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = log.edit();
+                editor.putString("username", params[0]);
+
                 Intent i = new Intent(context, MapActivity.class);
                 i.putExtra(USERNAME, params[0]);
                 startActivity(i);
+                finish();
             } else {
                 Toast.makeText(context, response.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -129,6 +137,11 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
             super.onProgressUpdate(values);
         }
 
+    }
+
+    protected void onDestroy(){
+        super.onDestroy();
+        MapActivity.currentUser = null;
     }
 
 }

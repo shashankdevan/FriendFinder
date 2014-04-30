@@ -5,16 +5,21 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import com.google.android.gcm.GCMBaseIntentService;
 
+import static com.example.friendfinder.Global.LOGIN_URL;
 import static com.example.friendfinder.Global.SENDER_ID;
 import static com.example.friendfinder.Global.USERNAME;
 
 public class GCMIntentService extends GCMBaseIntentService {
 
     static final String TAG = "SERVICE";
-
+    static String tickerText = null;
+    static String bigText = "This is expanded text This is expanded text This is expanded text This is expanded text";
+    static String notification_title = "Friend Finder";
     public GCMIntentService() {
         super(SENDER_ID);
     }
@@ -44,7 +49,8 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     protected void onMessage(Context context, Intent intent) {
         String username = intent.getExtras().getString("username");
-        String message = username + " " + getString(R.string.notification_message);
+        tickerText = username + " is nearby!";
+        String message = username + " is nearby. See " + username + "?";
         generateNotification(context, message);
     }
 
@@ -53,22 +59,39 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     }
 
-    private static void generateNotification(Context context, String message) {
-        int icon = R.drawable.ic_launcher;
-        long when = System.currentTimeMillis();
-        NotificationManager notificationManager = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification(icon, message, when);
+    private void generateNotification(Context context, String message) {
 
-        String title = context.getString(R.string.app_name);
+        if (MapActivity.currentUser != null) {
+            int icon = R.drawable.ic_launcher;
+            long when = System.currentTimeMillis();
+//        SharedPreferences log = PreferenceManager.getDefaultSharedPreferences(this);
 
-        Intent notificationIntent = new Intent(context, MapActivity.class);
+            Intent notificationIntent = new Intent(context, MapActivity.class);
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        notificationIntent.putExtra(USERNAME, log.getString("username", ""));
+            Log.d(TAG, "Username in generate notification : " + MapActivity.currentUser);
+            notificationIntent.putExtra(USERNAME, MapActivity.currentUser);
+            notificationIntent.putExtra("NOTIFICATION", "Notified");
+            PendingIntent p_intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-        notification.setLatestEventInfo(context, title, message, intent);
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            Notification notification = new Notification.Builder(context)
+                    .setContentTitle(notification_title)
+                    .setContentText(message)
+                    .setStyle(new Notification.BigTextStyle().bigText(bigText))
+                    .setSmallIcon(icon)
+                    .setWhen(when)
+                    .setTicker(tickerText)
+                    .setContentIntent(p_intent)
+                    .build();
 
-        notificationManager.notify(0, notification);
+            NotificationManager notificationManager = (NotificationManager)
+                    context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            notificationManager.notify(0, notification);
+        }
+        else{
+            Log.d(TAG, "User not logged in! Not being notified!");
+        }
+
     }
 }

@@ -73,6 +73,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
                 Intent i = new Intent(context, MapActivity.class);
                 i.putExtra(USERNAME, username);
                 startActivity(i);
+                finish();
             } else {
                 Toast.makeText(context, response.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -103,8 +104,9 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         unregisterReceiver(messageReceiver);
         GCMRegistrar.onDestroy(this);
-        super.onDestroy();
+        MapActivity.currentUser = null;
     }
 }
