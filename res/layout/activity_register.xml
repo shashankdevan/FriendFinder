@@ -28,11 +28,36 @@
 
     <Button
         android:id="@+id/buttonSubmit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="54dp"
         android:layout_below="@+id/editTextPassword"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
-        android:text="@string/submit" />
+        android:layout_marginRight="170dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:background="#f9bf00"
+        android:text="@string/create_account" />
+
+    <View
+        android:id="@+id/shadow1"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/buttonSubmit"
+        android:layout_marginLeft="86dp"
+        android:layout_marginRight="84dp"
+        android:background="#ae8500" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="54dp"
+        android:layout_alignBottom="@+id/shadow1"
+        android:layout_alignRight="@+id/shadow1"
+        android:background="#ae8500" />
 
 </RelativeLayout>
