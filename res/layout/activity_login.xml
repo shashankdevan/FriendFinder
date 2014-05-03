@@ -5,39 +5,93 @@
     android:layout_height="match_parent">
 
     <EditText
+        android:id="@+id/editTextUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextUsername"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="103dp"
+        android:layout_marginTop="60dp"
         android:layout_alignStart="@+id/editTextPassword"
-        android:layout_alignEnd="@+id/editTextPassword" />
+        android:layout_alignEnd="@+id/editTextPassword"
+        android:hint="@string/username" />
 
     <EditText
+        android:id="@+id/editTextPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
-        android:ems="10"
-        android:id="@+id/editTextPassword"
+        android:ems="12"
+        android:fontFamily="sans-serif"
         android:layout_below="@+id/editTextUsername"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="38dp" />
+        android:layout_marginTop="38dp"
+        android:hint="@string/password" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sign In"
         android:id="@+id/buttonSignIn"
-        android:layout_marginTop="66dp"
+        android:layout_width="fill_parent"
+        android:layout_height="54dp"
         android:layout_below="@+id/editTextPassword"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:layout_marginRight="170dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:background="#f9bf00"
+        android:text="Sign In" />
+
+    <View
+        android:id="@+id/shadow1"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/buttonSignIn"
+        android:layout_marginLeft="86dp"
+        android:layout_marginRight="84dp"
+        android:background="#ae8500" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="54dp"
+        android:layout_alignBottom="@+id/shadow1"
+        android:layout_alignRight="@+id/shadow1"
+        android:background="#ae8500" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Register"
         android:id="@+id/buttonRegister"
+        android:layout_width="fill_parent"
+        android:layout_height="54dp"
         android:layout_below="@+id/buttonSignIn"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="170dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:background="#f9bf00"
+        android:text="Register" />
+
+    <View
+        android:id="@+id/shadow2"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/buttonRegister"
+        android:layout_marginLeft="86dp"
+        android:layout_marginRight="84dp"
+        android:background="#ae8500" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="54dp"
+        android:layout_alignBottom="@+id/shadow2"
+        android:layout_alignRight="@+id/shadow2"
+        android:background="#ae8500" />
 
 </RelativeLayout>
