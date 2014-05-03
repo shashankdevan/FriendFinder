@@ -5,43 +5,34 @@
     android:layout_height="match_parent">
 
     <EditText
+        android:id="@+id/editTextUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextUsername"
-        android:autoText="false" android:text="Username or Email"
-        android:textColor="@color/common_signin_btn_light_text_focused"
-        android:textColorHighlight="@color/common_signin_btn_light_text_focused"
-        android:visibility="visible"
-        android:textColorHint="#171717"
-        android:textAppearance="@color/common_signin_btn_light_text_focused"
-        android:fontFamily="@string/auth_client_needs_enabling_title"
-        android:layout_alignBaseline="@+id/editTextPassword"
-        android:layout_alignBottom="@+id/editTextPassword"
-        android:layout_alignStart="@+id/editTextPassword" />
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="60dp"
+        android:layout_alignStart="@+id/editTextPassword"
+        android:layout_alignEnd="@+id/editTextPassword"
+        android:hint="@string/username" />
 
     <EditText
+        android:id="@+id/editTextPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
-        android:ems="10"
-        android:id="@+id/editTextPassword"
-        android:textColor="@color/common_signin_btn_light_text_focused"
-        android:text="Confirm Password"
-        android:textAppearance="@color/common_signin_btn_light_text_focused"
-        android:visibility="visible"
-        android:textAlignment="@integer/google_play_services_version"
-        android:singleLine="true"
+        android:ems="12"
+        android:fontFamily="sans-serif"
         android:layout_below="@+id/editTextUsername"
-        android:layout_alignStart="@+id/editTextUsername"
-        android:layout_marginTop="50dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:hint="@string/password" />
 
     <Button
+        android:id="@+id/buttonSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/submit"
-        android:id="@+id/buttonSubmit"
         android:layout_below="@+id/editTextPassword"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="74dp" />
+        android:layout_marginTop="40dp"
+        android:text="@string/submit" />
 
 </RelativeLayout>
