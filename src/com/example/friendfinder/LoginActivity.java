@@ -1,18 +1,17 @@
 package com.example.friendfinder;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -35,7 +34,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     private EditText editTextUsername;
     private EditText editTextPassword;
     private Button buttonSignIn;
-    private Button buttonRegister;
+    private TextView createAccountLink;
     private String[] params = new String[2];
     Context context;
     public SharedPreferences preferences;
@@ -48,10 +47,10 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
         editTextUsername = (EditText) findViewById(R.id.editTextUsername);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         buttonSignIn = (Button) findViewById(R.id.buttonSignIn);
-        buttonRegister = (Button) findViewById(R.id.buttonRegister);
+        createAccountLink = (TextView) findViewById(R.id.createAccountLink);
 
         buttonSignIn.setOnClickListener(this);
-        buttonRegister.setOnClickListener(this);
+        createAccountLink.setOnClickListener(this);
     }
 
     @Override
@@ -64,7 +63,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
                 mySession.delegate = (DataReceiver) context;
                 mySession.execute(params);
                 break;
-            case R.id.buttonRegister:
+            case R.id.createAccountLink:
                 Intent i = new Intent(context, RegisterActivity.class);
                 startActivity(i);
                 break;

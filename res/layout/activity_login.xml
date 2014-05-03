@@ -60,38 +60,17 @@
         android:layout_alignRight="@+id/shadow1"
         android:background="#ae8500" />
 
-    <Button
-        android:id="@+id/buttonRegister"
+
+    <TextView
+        android:id="@+id/createAccountLink"
         android:layout_width="fill_parent"
         android:layout_height="54dp"
         android:layout_below="@+id/buttonSignIn"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="170dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
-        android:background="#f9bf00"
-        android:text="Register" />
-
-    <View
-        android:id="@+id/shadow2"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/buttonRegister"
-        android:layout_marginLeft="86dp"
-        android:layout_marginRight="84dp"
-        android:background="#ae8500" />
-
-    <View
-        android:layout_width="1dp"
-        android:layout_height="54dp"
-        android:layout_alignBottom="@+id/shadow2"
-        android:layout_alignRight="@+id/shadow2"
-        android:background="#ae8500" />
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:textSize="16dp"
+        android:textColor="#916f00"
+        android:text="@string/create_account_link" />
 
 </RelativeLayout>
