@@ -1,14 +1,14 @@
 package com.example.friendfinder;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.app.ProgressDialog;
+import android.content.*;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -23,15 +23,15 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
     private EditText editTextUsername;
     private EditText editTextPassword;
     private Button buttonSubmit;
-
     public static String username = null;
     public static String password = null;
-
+    public SharedPreferences preferences;
     private Context context;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         context = this;
 
         editTextUsername = (EditText) findViewById(R.id.editTextUsername);
@@ -58,7 +58,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
                     GCMRegistrar.register(this, SENDER_ID);
                 } else {
                     String[] params = {regId};
-                    RegisterSession mySession = new RegisterSession();
+                    RegisterSession mySession = new RegisterSession(context);
                     mySession.delegate = (DataReceiver) context;
                     mySession.execute(params);
                 }
@@ -70,6 +70,11 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
     public void receive(ServerResponse response) {
         if (response != null) {
             if (response.getStatusCode() == 200) {
+                preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(USERNAME, username);
+                editor.commit();
+
                 Intent i = new Intent(context, MapActivity.class);
                 i.putExtra(USERNAME, username);
                 startActivity(i);
@@ -81,7 +86,20 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
     }
 
     private class RegisterSession extends AsyncTask<String, Void, ServerResponse> {
+        private final Context RegisterSessionContext;
         public DataReceiver delegate;
+        private ProgressDialog dialog;
+
+        public RegisterSession(Context context) {
+            RegisterSessionContext = context;
+            dialog = new ProgressDialog(RegisterSessionContext);
+        }
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setMessage("Signing up..");
+            this.dialog.show();
+        }
 
         @Override
         protected ServerResponse doInBackground(String... params) {
@@ -89,9 +107,16 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         }
 
         @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
         protected void onPostExecute(ServerResponse response) {
             super.onPostExecute(response);
             delegate.receive(response);
+            if (dialog.isShowing())
+                dialog.dismiss();
         }
     }
 
@@ -107,5 +132,8 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         super.onDestroy();
         unregisterReceiver(messageReceiver);
         GCMRegistrar.onDestroy(this);
+
+//        Intent i = new Intent(context, LoginActivity.class);
+//        startActivity(i);
     }
 }

@@ -137,7 +137,7 @@ public class MapActivity extends Activity implements DataReceiver {
     }
     @Override
     protected void onPause() {
-        ACTIVE = false;
+//        ACTIVE = false;
         super.onPause();
         Log.d(TAG, "onPause");
         locationManager.removeUpdates(listener);
@@ -249,29 +249,40 @@ public class MapActivity extends Activity implements DataReceiver {
 
     protected void onNewIntent(Intent intent)
     {
+        SQLiteDatabase database = databaseHelper.getWritableDatabase();
         super.onNewIntent(intent);
         setIntent(intent);
+
         String incoming_username = intent.getStringExtra(USERNAME);
         String latitude = intent.getStringExtra(LATITUDE);
         String longitude = intent.getStringExtra(LONGITUDE);
         Toast.makeText(this, "Notification from " + incoming_username + " at " + latitude + ", " + longitude, Toast.LENGTH_LONG).show();
 
+        database.execSQL("INSERT INTO friend_locations (username, latitude, longitude) VALUES ('" +
+                incoming_username + "', " +
+                latitude + ", " +
+                longitude + ")");
+        displayUserPosition();
+        displayFriends();
         /*put this new incoming user in database and make a call to displayUser and displayFriends
          */
 //        username = getIntent().getStringExtra(USERNAME);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(preferences.getLong(LATITUDE, 0),preferences.getLong(LONGITUDE, 0)), 16));
+//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(preferences.getLong(LATITUDE, 0),preferences.getLong(LONGITUDE, 0)), 16));
     }
 
     protected void onStop(){
         super.onStop();
         Log.d(TAG, "onStop");
         Toast.makeText(this, "onStop MapActivity", Toast.LENGTH_LONG).show();
+        locationManager.removeUpdates(listener);
         lastMapLocation = map.getCameraPosition();
     }
 
     protected void onDestroy(){
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+        locationManager.removeUpdates(listener);
+        lastMapLocation = map.getCameraPosition();
 
     }
 }
