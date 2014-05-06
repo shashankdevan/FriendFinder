@@ -69,10 +69,10 @@ public class MapActivity extends Activity implements DataReceiver {
          * time when a new user is signing onto the device.
          */
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        long initial_lat = preferences.getLong(LATITUDE, (long) 39.254119);
-        long initial_lng = preferences.getLong(LONGITUDE, (long) -76.712616);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(initial_lat, initial_lng), 10));
-
+        map.moveCamera(CameraUpdateFactory
+                .newLatLngZoom(new LatLng(
+                        Double.valueOf(preferences.getString(LATITUDE, "39.254119")),
+                        Double.valueOf(preferences.getString(LONGITUDE, "-76.712616"))), 10));
     }
 
     /* On start of the map activity request for GPS updates
@@ -121,8 +121,8 @@ public class MapActivity extends Activity implements DataReceiver {
             requestFriendLocations(location);
 
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putLong(LATITUDE, (long) location.getLatitude());
-            editor.putLong(LONGITUDE, (long) location.getLongitude());
+            editor.putString(LATITUDE, String.valueOf(location.getLatitude()));
+            editor.putString(LONGITUDE, String.valueOf(location.getLongitude()));
             editor.commit();
         }
 
