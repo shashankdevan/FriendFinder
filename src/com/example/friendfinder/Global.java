@@ -3,6 +3,8 @@ package com.example.friendfinder;
 import android.content.Context;
 import android.content.Intent;
 
+/* All the constants are here
+ */
 public final class Global {
 
     static final String SENDER_ID = "83386399536";
@@ -14,7 +16,6 @@ public final class Global {
     static final String USERNAME = "username";
     static final String LATITUDE = "latitude";
     static final String LONGITUDE = "longitude";
-    static final String ZOOM = "zoom";
 
     static void displayMessage(Context context, String message) {
         Intent intent = new Intent(DISPLAY_MESSAGE_ACTION);

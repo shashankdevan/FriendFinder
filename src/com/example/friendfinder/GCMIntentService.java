@@ -24,11 +24,21 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     protected void onRegistered(Context context, String registrationId) {
+        /* Register the device with the friend finder server once we are done
+         * with the GCM registration
+         */
         ServerResponse response = BackendServer
                 .register(context, RegisterActivity.username, RegisterActivity.password, registrationId);
 
+        /* Once the registration is successful, store the user session and open the map for that user
+         */
         if (response != null) {
             if (response.getStatusCode() == 200) {
+                preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(USERNAME, RegisterActivity.username);
+                editor.commit();
+
                 Intent i = new Intent(context, MapActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 i.putExtra(USERNAME, RegisterActivity.username);
@@ -44,11 +54,12 @@ public class GCMIntentService extends GCMBaseIntentService {
         BackendServer.unregister(context, registrationId);
     }
 
+    /* On receiving the message generate a notification */
     @Override
     protected void onMessage(Context context, Intent intent) {
-        String username = intent.getExtras().getString("username");
-        String lat = intent.getExtras().getString("latitude");
-        String lng = intent.getExtras().getString("longitude");
+        String username = intent.getExtras().getString(USERNAME);
+        String lat = intent.getExtras().getString(LATITUDE);
+        String lng = intent.getExtras().getString(LONGITUDE);
         generateNotification(context, username, lat, lng);
     }
 
@@ -58,11 +69,12 @@ public class GCMIntentService extends GCMBaseIntentService {
     }
 
     private void generateNotification(Context context, String username, String lat, String lng) {
-
         String message = username + " is nearby. See " + username + "?";
         String tickerText = username + " is nearby!";
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        /* Generate teh notification only when there is a user currently logged in
+         */
         if (preferences.getString(USERNAME, "") != "") {
             int icon = R.drawable.ic_launcher;
             long when = System.currentTimeMillis();
@@ -70,7 +82,6 @@ public class GCMIntentService extends GCMBaseIntentService {
             Intent notificationIntent = new Intent(context, MapActivity.class);
             notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-            Log.d(TAG, "Notification from " + username + " at " + lat + ", " + lng);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("incoming_user", username);
             editor.putString("incoming_lat", lat);
@@ -94,4 +105,5 @@ public class GCMIntentService extends GCMBaseIntentService {
             notificationManager.notify(0, notification);
         }
     }
+
 }

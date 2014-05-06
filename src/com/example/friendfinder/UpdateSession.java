@@ -16,6 +16,9 @@ import java.util.List;
 
 import static com.example.friendfinder.Global.UPDATE_URL;
 
+/* An async task to send the updated position to the server and get the updated
+ * friend positions from the server.
+ */
 public class UpdateSession extends AsyncTask<String, Integer, ServerResponse> {
     public DataReceiver delegate;
 

@@ -18,6 +18,10 @@ import java.util.List;
 
 import static com.example.friendfinder.Global.REGISTER_URL;
 
+/* A class to put all the server functions in one place, so that anybody can
+ * call the static methods on this class. Due to time constraint currently we
+ * only have the register and unregister methods.
+ */
 public class BackendServer {
 
     static final String TAG = "SERVER";

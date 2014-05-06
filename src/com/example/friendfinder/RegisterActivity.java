@@ -38,6 +38,8 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
 
+        /* Register a broadcast receiver to receive the messages from the GCMService
+         */
         registerReceiver(messageReceiver, new IntentFilter(DISPLAY_MESSAGE_ACTION));
         buttonSubmit.setOnClickListener(this);
     }
@@ -54,6 +56,9 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
 
                 Log.d(TAG, regId);
 
+                /* Register with the GCM server is not registered the device already
+                 * else register only with our server.
+                 */
                 if (regId.equals("")) {
                     GCMRegistrar.register(this, SENDER_ID);
                 } else {
@@ -66,6 +71,9 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         }
     }
 
+    /* Receives the response after the registration request is processed by the server
+     * On success open the map to display the friends else show an error message toast
+     */
     @Override
     public void receive(ServerResponse response) {
         if (response != null) {
@@ -85,6 +93,8 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         }
     }
 
+    /* Async task to send the registration request to the server asynchronously
+     */
     private class RegisterSession extends AsyncTask<String, Void, ServerResponse> {
         private final Context RegisterSessionContext;
         public DataReceiver delegate;
@@ -95,6 +105,8 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
             dialog = new ProgressDialog(RegisterSessionContext);
         }
 
+        /* Showing a loading kind of dialog while the server is processing the request
+         */
         protected void onPreExecute() {
             super.onPreExecute();
             this.dialog.setMessage("Signing up..");
@@ -120,6 +132,10 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         }
     }
 
+    /* Broadcast receiver to receive message from the GCMIntentServive. When the server sends a response
+     * the error messages need to be display on the screen. This reciever captures the messages and
+     * displays a toast message.
+     */
     private final BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

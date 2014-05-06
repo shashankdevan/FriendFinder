@@ -43,7 +43,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         context = this;
 
         editTextUsername = (EditText) findViewById(R.id.editTextUsername);
@@ -59,6 +58,9 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonSignIn:
+                /* Take username and password from the user and call a async task to authenticate
+                 * with the server.
+                 */
                 params[0] = editTextUsername.getText().toString();
                 params[1] = editTextPassword.getText().toString();
                 LoginSession mySession = new LoginSession(context);
@@ -66,12 +68,17 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
                 mySession.execute(params);
                 break;
             case R.id.createAccountLink:
+                /* Call the register activity of the user clicks on the "Create an account" link
+                 */
                 Intent i = new Intent(context, RegisterActivity.class);
                 startActivity(i);
                 break;
         }
     }
 
+    /* Receives the response after the authentication request is processed by the server
+     * On success open the map to display the friends else show an error message toast
+     */
     @Override
     public void receive(ServerResponse response) {
         if (response != null) {
@@ -91,6 +98,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
         }
     }
 
+    /* Async task to send the authentication request to the server asynchronously
+     */
     private static class LoginSession extends AsyncTask<String, Integer, ServerResponse> {
         private final Context LoginSessionContext;
         public DataReceiver delegate;
@@ -143,6 +152,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
                 dialog.dismiss();
         }
 
+        /* Showing a loading kind of dialog while the server is processing the request
+         */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

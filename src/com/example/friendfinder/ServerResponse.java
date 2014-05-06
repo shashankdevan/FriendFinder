@@ -1,5 +1,8 @@
 package com.example.friendfinder;
 
+/* A simple class to wrap the server response instead of passing the entire
+ * http response object.
+ */
 public class ServerResponse {
 
     private int statusCode;

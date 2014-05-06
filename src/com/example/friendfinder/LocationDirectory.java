@@ -9,29 +9,27 @@ import static com.example.friendfinder.Global.LATITUDE;
 import static com.example.friendfinder.Global.LONGITUDE;
 import static com.example.friendfinder.Global.USERNAME;
 
-/**
- * Created by shashank on 4/30/14.
- */
-public class LocationDirectoryOpenHelper extends SQLiteOpenHelper{
+public class LocationDirectory extends SQLiteOpenHelper {
 
+    private static final String TAG = "LOCATION_HELPER";
     private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "friend_locations";
-    public static final String DATABASE_CREATE =
-            "CREATE TABLE IF NOT EXISTS " + DATABASE_NAME + " (" +
-                    USERNAME + " VARCHAR(32), " +
-                    LATITUDE + " TEXT," +
-                    LONGITUDE + " TEXT);";
-    private static final String TAG = "LOCATION_HELPER";
+    public static final String DATABASE_CREATE = "CREATE TABLE IF NOT EXISTS " +
+            DATABASE_NAME + " (" +
+            USERNAME + " VARCHAR(32), " +
+            LATITUDE + " TEXT," +
+            LONGITUDE + " TEXT);";
 
-    public LocationDirectoryOpenHelper(Context context) {
+    public LocationDirectory(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        Log.d(TAG, "in LocationHelper's Constructor");
     }
 
+    /* Database to store the friend locations temporarily while the device does not get
+     * an updated list from the server.
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(DATABASE_CREATE);
-        Log.d(TAG, "creating database");
     }
 
     @Override
