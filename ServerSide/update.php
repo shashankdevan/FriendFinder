@@ -7,6 +7,10 @@ $longitude = $_REQUEST["longitude"];
 $time= $_REQUEST["time"];
 $id = $_REQUEST["id"];
 
+
+// Check for error conditions and return back sane messages and HTTP code
+// so that the client knows the problem.
+
 if(empty($latitude) or empty($longitude)) {
     header("HTTP/1.0 400 Bad Request");
     die("Location attributes cannot be blank.");
@@ -21,6 +25,9 @@ if(empty($id)) {
     header("HTTP/1.0 400 Bad Request");
     die("Username cannot be blank.");
 }
+
+
+// Connect with the database.
 
 $db_username = file_get_contents('./database_config.txt', NULL, NULL, 0, 11);
 $db_password = file_get_contents('./database_config.txt', NULL, NULL, 0, 15);
@@ -38,10 +45,16 @@ if(!$db_selected) {
     die("Can\'t use '$database': " . mysql_error());
 }
 
+
+// Throw an error if the user does not exist in the database.
+
 if(!table_exists("$id")) {
     header("HTTP/1.0 400 Bad Request");
     die("User does not exist.");
 }
+
+
+// Insert the updated location from the user in their table of locations.
 
 $sql = "INSERT INTO $id (Date, Latitude, Longitude) VALUES ('$time', '$latitude', '$longitude')";
 
@@ -51,6 +64,9 @@ if(!$result) {
     header("HTTP/1.0 400 Bad Request");
     die("Only one location update is allowed at a given time.");
 }
+
+
+// Prepare an array of friends of that user who are nearby in a radius of 200 meters
 
 $list = mysql_list_tables($database);
 $i = 0;
@@ -89,12 +105,19 @@ while($i < mysql_num_rows($list)) {
     $i++;
 }
 
+
+// Return the friends and their locations to the user who has sent the update request.
+
 for ($i = 0; $i < $count; $i++) {
     print "$idarray[$i],";
     print "$latarray[$i],";
     print "$longarray[$i]";
     print "\n";
 }
+
+
+// Extract out the registration ids of the friends nearby, so that we can send a
+// notification to them about this user being nearby.
 
 $reg_ids = array();
 
@@ -103,6 +126,10 @@ for ($i = 0; $i < $count; $i++) {
     $result = mysql_query($sql, $con);
     $reg_ids[] = mysql_result($result, 0, "RegistrationId");
 }
+
+
+// Send a request to the GCM server, to send notification with the message to the
+// specified registration ids
 
 $message = array("username" => $id, "latitude" => $latitude, "longitude" => $longitude);
 send_notification($reg_ids, $message);

@@ -4,6 +4,10 @@ $username = $_REQUEST["username"];
 $password = $_REQUEST["password"];
 $registration_id = $_REQUEST["registrationId"];
 
+
+// Check for error conditions and return back sane messages and HTTP code
+// so that the client knows the problem.
+
 if(empty($username) or empty($password)) {
     header("HTTP/1.0 400 Bad Request");
     die("Username or Password cannot be blank.");
@@ -13,6 +17,9 @@ if(empty($registration_id)) {
     header("HTTP/1.0 400 Bad Request");
     die("Registration Id cannot be blank.");
 }
+
+
+// Connect with the database.
 
 $db_username = file_get_contents('./database_config.txt', NULL, NULL, 0, 11);
 $db_password = file_get_contents('./database_config.txt', NULL, NULL, 0, 15);
@@ -29,6 +36,9 @@ if(!$db_selected) {
     header("HTTP/1.0 500 Internal Server Error");
     die('Can\'t use mobile_artisans: ' . mysql_error());
 }
+
+
+// Create a user table if it does not exist, where all the user information will be stored.
 
 if(!table_exists("user")) {
 
@@ -48,6 +58,10 @@ if(!table_exists("user")) {
     }
 }
 
+
+// Create an entry for the new user in the user table with their password
+// and registration id.
+
 $sql = "INSERT INTO user (Username, Password, RegistrationId) VALUES ('$username', '$password', '$registration_id')";
 
 $result = mysql_query($sql, $con);
@@ -56,6 +70,9 @@ if(!$result) {
     header("HTTP/1.0 400 Bad Request");
     die("Username already exists.");
 }
+
+
+// Create an user table to store their location values in the future.
 
 $sql = "CREATE TABLE $username (Date DATETIME, PRIMARY KEY(Date), Latitude FLOAT(14,10), Longitude FLOAT(14,10))";
 
