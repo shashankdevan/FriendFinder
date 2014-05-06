@@ -35,7 +35,8 @@ import static com.example.friendfinder.Global.*;
 
 public class MapActivity extends Activity implements DataReceiver {
 
-    static final String TAG = "MAP";
+    private static final String TAG = "MAP";
+    private static final long UPDATE_INTERVAL = 20 * 1000;
     public static CameraPosition lastMapLocation;
 
     private Context context;
@@ -80,7 +81,7 @@ public class MapActivity extends Activity implements DataReceiver {
         super.onStart();
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             showEnableGpsDialog();
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 7000, 0, listener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, UPDATE_INTERVAL, 0, listener);
     }
 
     /* Unregister GPS updates onPause and store the camera position
