@@ -77,7 +77,7 @@ while($i < mysql_num_rows($list)) {
         $fieldlongitude = mysql_result($result, $j, "Longitude");
         $phpdate = strtotime($fielddate);
         $dist = distance($fieldlatitude, $fieldlongitude, $latitude, $longitude);
-        if($dist < 2) {
+        if($dist < 0.2) {
             $idarray[] = $tb_names[$i];
             $latarray[] = $fieldlatitude;
             $longarray[] = $fieldlongitude;
