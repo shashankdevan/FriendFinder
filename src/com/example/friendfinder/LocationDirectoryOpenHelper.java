@@ -19,8 +19,8 @@ public class LocationDirectoryOpenHelper extends SQLiteOpenHelper{
     public static final String DATABASE_CREATE =
             "CREATE TABLE IF NOT EXISTS " + DATABASE_NAME + " (" +
                     USERNAME + " VARCHAR(32), " +
-                    LATITUDE + " FLOAT(14,10)," +
-                    LONGITUDE + " FLOAT(14,10));";
+                    LATITUDE + " TEXT," +
+                    LONGITUDE + " TEXT);";
     private static final String TAG = "LOCATION_HELPER";
 
     public LocationDirectoryOpenHelper(Context context) {

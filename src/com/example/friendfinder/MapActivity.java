@@ -2,6 +2,7 @@ package com.example.friendfinder;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -36,7 +38,6 @@ import static com.example.friendfinder.Global.*;
 public class MapActivity extends Activity implements DataReceiver {
 
     static final String TAG = "MAP";
-    static boolean ACTIVE = false;
 
     private Context context;
     private GoogleMap map;
@@ -51,35 +52,34 @@ public class MapActivity extends Activity implements DataReceiver {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ACTIVE = true;
-        Log.d(TAG, "On Create");
-
         setContentView(R.layout.activity_map);
+
         context = this;
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Log.d(TAG, "On Create" + preferences.getString(USERNAME, ""));
 
-        /* Create android database for storing friend locations
-         */
+            /* Create android database for storing friend locations
+             */
         databaseHelper = new LocationDirectoryOpenHelper(context);
 
-        /* Check if GPS is enabled, if not
-        prompt the user the enable GPS
-         */
-        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE );
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            /* Check if GPS is enabled, if not
+            prompt the user the enable GPS
+             */
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             showEnableGpsDialog();
         }
-        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER )){
-            if (manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                 manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, listener);
             }
         }
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 
-        /* Get user last known location from SharedPreferences
-        Set Camera's initial position to this location
-         */
+            /* Get user last known location from SharedPreferences
+            Set Camera's initial position to this location
+             */
         long initial_lat = preferences.getLong(LATITUDE, (long) 39.254119);
         long initial_lng = preferences.getLong(LONGITUDE, (long) -76.712616);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(initial_lat, initial_lng), 10));
@@ -90,7 +90,7 @@ public class MapActivity extends Activity implements DataReceiver {
     }
 
     /* Menu options for the current screen on the action bar.
-	 */
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.map_activity_menu, menu);
@@ -100,10 +100,7 @@ public class MapActivity extends Activity implements DataReceiver {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.logout:
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(USERNAME, null);
-                editor.commit();
-
+                clearUserSession();
                 Intent i = new Intent(context, LoginActivity.class);
                 startActivity(i);
                 finish();
@@ -111,6 +108,17 @@ public class MapActivity extends Activity implements DataReceiver {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void clearUserSession() {
+        SQLiteDatabase database = databaseHelper.getWritableDatabase();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(USERNAME, null);
+        editor.commit();
+        database.execSQL("DELETE FROM friend_locations;");
+        NotificationManager notificationManager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
     }
 
     private void showEnableGpsDialog() {
@@ -131,13 +139,13 @@ public class MapActivity extends Activity implements DataReceiver {
         alertDialog.show();
     }
 
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
     }
+
     @Override
     protected void onPause() {
-//        ACTIVE = false;
         super.onPause();
         Log.d(TAG, "onPause");
         locationManager.removeUpdates(listener);
@@ -151,7 +159,7 @@ public class MapActivity extends Activity implements DataReceiver {
         params[0] = timeStamp;
         params[1] = String.valueOf(location.getLatitude());
         params[2] = String.valueOf(location.getLongitude());
-        params[3] = preferences.getString(USERNAME,"");
+        params[3] = preferences.getString(USERNAME, "");
 
         UpdateSession mySession = new UpdateSession();
         mySession.delegate = (DataReceiver) context;
@@ -165,9 +173,9 @@ public class MapActivity extends Activity implements DataReceiver {
             userPosition = location;
             requestFriendLocations(location);
 
-            /* Store current location of user
-            for future reference
-             */
+                /* Store current location of user
+                for future reference
+                 */
             SharedPreferences.Editor editor = preferences.edit();
             editor.putLong(LATITUDE, (long) location.getLatitude());
             editor.putLong(LONGITUDE, (long) location.getLongitude());
@@ -197,11 +205,10 @@ public class MapActivity extends Activity implements DataReceiver {
         String responseString = response.getMessage();
         String lines[] = responseString.split("\\r?\\n");
 
-        for (String line : lines){
+        for (String line : lines) {
             if (line.isEmpty())
                 break;
             String params[] = line.split(",");
-            Log.d(TAG, params.length + " " + line);
             database.execSQL("INSERT INTO friend_locations (username, latitude, longitude) VALUES ('" +
                     params[0] + "', " +
                     params[1] + ", " +
@@ -209,8 +216,7 @@ public class MapActivity extends Activity implements DataReceiver {
         }
 
         displayUserPosition();
-        if (response != null)
-            displayFriends();
+        displayFriends();
     }
 
     private void displayUserPosition() {
@@ -220,26 +226,27 @@ public class MapActivity extends Activity implements DataReceiver {
         map.clear();
         map.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
-                .title(preferences.getString(USERNAME,""))
+                .title(preferences.getString(USERNAME, ""))
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_self_marker)));
     }
 
     private void displayFriends() {
 
-        String uname, lat, lng;
+        String uname;
+        double lat, lng;
         SQLiteDatabase database = databaseHelper.getReadableDatabase();
         String sql = "SELECT username, latitude, longitude FROM friend_locations";
         Cursor result = database.rawQuery(sql, null);
 
         result.moveToFirst();
-        while (result.isAfterLast() == false) {
+        while (!result.isAfterLast()) {
             uname = result.getString(0);
-            lat = result.getString(1);
-            lng = result.getString(2);
-            Log.d(TAG, uname + " " + lat + " " + lng);
+            lat = result.getDouble(1);
+            lng = result.getDouble(2);
+            Log.d(TAG, "From database " + uname + " " + lat + " " + lng);
 
             map.addMarker(new MarkerOptions()
-                    .position(new LatLng(Double.valueOf(lat), Double.valueOf(lng)))
+                    .position(new LatLng(lat, lng))
                     .title(uname)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_friend_marker)));
             result.moveToNext();
@@ -247,11 +254,14 @@ public class MapActivity extends Activity implements DataReceiver {
         result.close();
     }
 
-    protected void onNewIntent(Intent intent)
-    {
+    protected void onNewIntent(Intent intent) {
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         super.onNewIntent(intent);
         setIntent(intent);
+
+        Log.d(TAG, "fininshing");
+        if (preferences.getString(USERNAME, "") == "")
+            finish();
 
         String incoming_username = intent.getStringExtra(USERNAME);
         String latitude = intent.getStringExtra(LATITUDE);
@@ -264,13 +274,9 @@ public class MapActivity extends Activity implements DataReceiver {
                 longitude + ")");
         displayUserPosition();
         displayFriends();
-        /*put this new incoming user in database and make a call to displayUser and displayFriends
-         */
-//        username = getIntent().getStringExtra(USERNAME);
-//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(preferences.getLong(LATITUDE, 0),preferences.getLong(LONGITUDE, 0)), 16));
     }
 
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
         Toast.makeText(this, "onStop MapActivity", Toast.LENGTH_LONG).show();
@@ -278,11 +284,11 @@ public class MapActivity extends Activity implements DataReceiver {
         lastMapLocation = map.getCameraPosition();
     }
 
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
         locationManager.removeUpdates(listener);
         lastMapLocation = map.getCameraPosition();
-
+        clearUserSession();
     }
 }
