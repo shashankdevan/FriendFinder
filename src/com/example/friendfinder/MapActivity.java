@@ -221,7 +221,7 @@ public class MapActivity extends Activity implements DataReceiver {
         map.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
                 .title(preferences.getString(USERNAME,""))
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_self_marker)));
     }
 
     private void displayFriends() {
@@ -241,7 +241,7 @@ public class MapActivity extends Activity implements DataReceiver {
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.valueOf(lat), Double.valueOf(lng)))
                     .title(uname)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_friend_marker)));
             result.moveToNext();
         }
         result.close();
