@@ -200,11 +200,11 @@ public class MapActivity extends Activity implements DataReceiver {
 
     @Override
     public void receive(ServerResponse response) {
-
         SQLiteDatabase database = databaseHelper.getWritableDatabase();
         String responseString = response.getMessage();
         String lines[] = responseString.split("\\r?\\n");
 
+        database.execSQL("DELETE FROM friend_locations;");
         for (String line : lines) {
             if (line.isEmpty())
                 break;
@@ -259,13 +259,13 @@ public class MapActivity extends Activity implements DataReceiver {
         super.onNewIntent(intent);
         setIntent(intent);
 
-        Log.d(TAG, "fininshing");
-        if (preferences.getString(USERNAME, "") == "")
-            finish();
-
-        String incoming_username = intent.getStringExtra(USERNAME);
-        String latitude = intent.getStringExtra(LATITUDE);
-        String longitude = intent.getStringExtra(LONGITUDE);
+//        String incoming_username = intent.getStringExtra(USERNAME);
+//        String latitude = intent.getStringExtra(LATITUDE);
+//        String longitude = intent.getStringExtra(LONGITUDE);
+        String incoming_username = preferences.getString("incoming_user","");
+        String latitude = preferences.getString("incoming_lat","");
+        String longitude = preferences.getString("incoming_lng","");
+        Log.d(TAG, "Notification from -----------> " + incoming_username);
         Toast.makeText(this, "Notification from " + incoming_username + " at " + latitude + ", " + longitude, Toast.LENGTH_LONG).show();
 
         database.execSQL("INSERT INTO friend_locations (username, latitude, longitude) VALUES ('" +

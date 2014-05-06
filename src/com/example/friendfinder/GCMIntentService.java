@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 import com.google.android.gcm.GCMBaseIntentService;
 
 import static com.example.friendfinder.Global.*;
@@ -70,9 +71,16 @@ public class GCMIntentService extends GCMBaseIntentService {
             Intent notificationIntent = new Intent(context, MapActivity.class);
             notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-            notificationIntent.putExtra(USERNAME, username);
-            notificationIntent.putExtra(LATITUDE, lat);
-            notificationIntent.putExtra(LONGITUDE, lng);
+            Log.d(TAG, "Notification from " + username + " at " + lat + ", " + lng);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("incoming_user", username);
+            editor.putString("incoming_lat", lat);
+            editor.putString("incoming_lng", lng);
+            editor.commit();
+
+//            notificationIntent.putExtra(USERNAME, username);
+//            notificationIntent.putExtra(LATITUDE, lat);
+//            notificationIntent.putExtra(LONGITUDE, lng);
             PendingIntent p_intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
             Notification notification = new Notification.Builder(context)
