@@ -132,8 +132,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         super.onDestroy();
         unregisterReceiver(messageReceiver);
         GCMRegistrar.onDestroy(this);
-
-//        Intent i = new Intent(context, LoginActivity.class);
-//        startActivity(i);
     }
+
 }

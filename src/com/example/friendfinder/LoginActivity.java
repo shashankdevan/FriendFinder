@@ -96,6 +96,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
         public DataReceiver delegate;
 
         private ProgressDialog dialog;
+
         public LoginSession(Context context) {
             LoginSessionContext = context;
             dialog = new ProgressDialog(LoginSessionContext);
@@ -156,7 +157,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
 
     }
 
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
 
     }

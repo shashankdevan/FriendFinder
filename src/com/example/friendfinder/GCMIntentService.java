@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 import com.google.android.gcm.GCMBaseIntentService;
 
 import static com.example.friendfinder.Global.*;
@@ -78,9 +77,6 @@ public class GCMIntentService extends GCMBaseIntentService {
             editor.putString("incoming_lng", lng);
             editor.commit();
 
-//            notificationIntent.putExtra(USERNAME, username);
-//            notificationIntent.putExtra(LATITUDE, lat);
-//            notificationIntent.putExtra(LONGITUDE, lng);
             PendingIntent p_intent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
             Notification notification = new Notification.Builder(context)
